@@ -152,6 +152,14 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .steps li::before{content:counter(s);grid-row:span 2;width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center}
 .proc-link{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink);text-decoration:none}
 .proc-link b{display:block;font-size:14px}
+.acc-link{width:100%;text-align:left;border:1px dashed var(--line);background:var(--surface)}
+.proc-link.acc-link small{color:var(--muted)}
+#catalogo,#entregas,#como-comprar{scroll-margin-top:calc(170px + env(safe-area-inset-top,0px))}
+.soon-tag{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:var(--accent-soft);color:var(--accent);margin-left:2px}
+.chip[aria-pressed="true"] .soon-tag{background:var(--accent);color:var(--accent-ink)}
+.soon-box{display:grid;gap:8px;justify-items:center;color:var(--muted)}
+.soon-box b{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:20px;color:var(--ink)}
+.soon-box .eyebrow{color:var(--accent);opacity:1}
 .proc-link small{font-size:12.5px;color:var(--accent);font-weight:700}
 .proc-link svg,.back svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .page .wrap{padding-block:16px 10px;display:grid;gap:14px;max-width:760px}
@@ -268,6 +276,10 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
       <span><b>Revisada, lavada, desinfectada y planchada</b><small>Así preparamos cada prenda</small></span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
     </a>
+    <button class="proc-link acc-link" data-g="accesorios" data-scroll="1">
+      <span><b>Accesorios</b><small>Próximamente: bolsas, cinturones, gorras y más</small></span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
   </section>
 
   <section class="section wrap" id="catalogo" aria-labelledby="catH">
@@ -365,8 +377,12 @@ const TIERS = {
   primera: { label: "De primera", color: "var(--t-primera)", desc: "Como nuevas, sin detalles visibles." },
   premium: { label: "Premium",    color: "var(--t-premium)", desc: "Marcas reconocidas, algunas con etiqueta." }
 };
-const GENDERS = [["todo","Todo"],["mujer","Mujer"],["hombre","Hombre"],["ninos","Niñas y niños"]];
-const TYPES = {todo:"Todas",chamarra:"Chamarras",sudadera:"Sudaderas",sueter:"Suéteres",camisa:"Camisas",playera:"Playeras y blusas",vestido:"Vestidos",enterizo:"Enterizos",falda:"Faldas",jeans:"Jeans",short:"Shorts"};
+const GENDERS = [["todo","Todo"],["mujer","Mujer"],["hombre","Hombre"],["ninos","Niñas y niños"],["accesorios","Accesorios"]];
+/* Accesorios: usa gender:"accesorios" y uno de estos tipos. Mientras no haya ninguno, la sección muestra "Próximamente". */
+const ACC_TYPES = ["bolsa","cinturon","gorra","lentes","joyeria"];
+const TYPES = {todo:"Todas",chamarra:"Chamarras",sudadera:"Sudaderas",sueter:"Suéteres",camisa:"Camisas",playera:"Playeras y blusas",vestido:"Vestidos",enterizo:"Enterizos",falda:"Faldas",jeans:"Jeans",short:"Shorts",
+  bolsa:"Bolsas",cinturon:"Cinturones",gorra:"Gorras",lentes:"Lentes",joyeria:"Joyería"};
+const hasAcc = () => PRODUCTS.some(p=>p.gender==="accesorios");
 
 /* Prendas de ejemplo: reemplaza con tu inventario real. Cuando tengas fotos, agrega  foto: "fotos/archivo.jpg" */
 const PRODUCTS = [
@@ -427,7 +443,7 @@ function garment(p){
   const src = p.fotos ? p.fotos[0] : p.foto;
   if (src) return `<img class="photo" src="${src}" alt="" loading="lazy">`;
   return `<svg class="g" viewBox="0 0 100 100" aria-hidden="true">
-    <path d="${SHAPES[p.type]}" fill="${p.color}" stroke="rgba(0,0,0,.28)" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="${SHAPES[p.type]||"M24 38 H76 L72 90 H28 Z"}" fill="${p.color}" stroke="rgba(0,0,0,.28)" stroke-width="1.2" stroke-linejoin="round"/>
     <g fill="none" stroke="rgba(0,0,0,.3)" stroke-width="1.2" stroke-linecap="round">${DETAILS[p.type]||""}</g>
   </svg>`;
 }
@@ -443,8 +459,9 @@ const waLink = text => `https://wa.me/${STORE.whatsapp}` + (text ? `?text=${enco
 /* ===== Render ===== */
 function renderRails(){
   $("#genderRail").innerHTML = GENDERS.map(([k,l]) =>
-    `<button class="chip" data-g="${k}" aria-pressed="${state.gender===k}">${l}</button>`).join("");
-  $("#typeRail").innerHTML = Object.entries(TYPES).map(([k,l]) =>
+    `<button class="chip" data-g="${k}" aria-pressed="${state.gender===k}">${l}${k==="accesorios"&&!hasAcc()?' <span class="soon-tag">Pronto</span>':""}</button>`).join("");
+  const acc = state.gender==="accesorios";
+  $("#typeRail").innerHTML = Object.entries(TYPES).filter(([k]) => k==="todo" || ACC_TYPES.includes(k)===acc).map(([k,l]) =>
     `<button class="chip" data-t="${k}" aria-pressed="${state.type===k}">${l}</button>`).join("");
   const cur = state.tier || "all";
   $("#tiers").innerHTML = [["all","Todas"], ...Object.entries(TIERS).map(([k,t])=>[k,t.label])]
@@ -479,7 +496,11 @@ function renderGrid(){
       <h3>${p.name}</h3>
       <div class="meta"><span class="price">${money(p.price)}</span><span class="size">Talla ${p.size}</span></div>
     </button>`).join("")
-    : `<div class="empty">No encontramos prendas con esos filtros.<br><button class="linkish" id="clear">Quitar filtros</button></div>`;
+    : (state.gender==="accesorios" && !hasAcc())
+      ? `<div class="empty soon-box"><span class="eyebrow">Próximamente</span><b>Accesorios</b>
+          <span>Bolsas, cinturones, gorras, lentes y joyería. Escríbenos y te avisamos cuando lleguen.</span>
+          <a class="btn btn-wa" style="width:auto" target="_blank" rel="noopener" href="${waLink(`Hola ${STORE.name}, avísenme cuando lleguen los accesorios.`)}">Avísame por WhatsApp</a></div>`
+      : `<div class="empty">No encontramos prendas con esos filtros.<br><button class="linkish" id="clear">Quitar filtros</button></div>`;
 }
 function renderCount(){
   const n = state.bag.length, el = $("#bagCount");
@@ -600,7 +621,11 @@ function validOrder(){
 document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if(!t) return;
   if (t.dataset.slide){ const tr=$("#galTrack"); tr.scrollTo({left:+t.dataset.slide*tr.clientWidth, behavior:"smooth"}); }
-  else if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); toShop(); }
+  else if (t.dataset.g){ const was = state.gender==="accesorios";
+    state.gender=t.dataset.g; if ((state.gender==="accesorios")!==was) state.type="todo";
+    renderRails(); renderGrid(); toShop();
+    const rail=$("#genderRail"), on=rail.querySelector('[aria-pressed="true"]'); rail.scrollTo({left:Math.max(0,on.offsetLeft-rail.offsetLeft-16), behavior:"smooth"});
+    if (t.dataset.scroll) document.getElementById("catalogo").scrollIntoView(); }
   else if (t.dataset.t){ state.type=t.dataset.t; renderRails(); renderGrid(); }
   else if (t.dataset.tier){ state.tier = t.dataset.tier==="all" ? null : t.dataset.tier; renderRails(); renderGrid(); }
   else if (t.id==="clear"){ Object.assign(state,{gender:"todo",tier:null,type:"todo",q:""}); $("#q").value=""; renderRails(); renderGrid(); }
