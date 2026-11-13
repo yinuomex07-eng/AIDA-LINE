@@ -174,6 +174,14 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .page-lead{margin:0;color:var(--muted);font-size:15.5px;max-width:60ch}
 .page .steps{grid-template-columns:1fr}
 .page-cta{justify-self:start;width:auto}
+.pol{display:grid;gap:10px;padding-top:12px;border-top:1px solid var(--line)}
+.pol h2{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:19px}
+.pol p{margin:0;color:var(--muted);max-width:62ch}
+.pol p b,.pol li b{color:var(--ink)}
+.pol ul{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--muted);max-width:62ch}
+.callout{background:var(--accent-soft);color:var(--ink)!important;border-radius:12px;padding:12px 14px;font-size:14px}
+.terms{margin:0;font-size:12.5px;color:var(--muted);text-align:center}
+.terms a,.note a,.dcard a{color:var(--ink);font-weight:700}
 .foot-link{color:var(--ink);font-weight:600;justify-self:start}
 .steps b{font-size:15px}.steps span{font-size:13.5px;color:var(--muted)}
 .delivery{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
@@ -323,7 +331,7 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
       <li><b>Confirmamos y entregamos</b><span>Te avisamos si la pieza sigue disponible y acordamos entrega y pago.</span></li>
     </ol>
     <div class="dcard ap-card" id="apartados"><span class="k">Apartados</span><b>Aparta con 50% y liquida en 7 días</b>
-      <p>Elige "Apartar" en la prenda o en tu bolsa, envía tu anticipo y la guardamos una semana para ti. Si no liquidas en 7 días, la prenda vuelve a la venta y el anticipo no se devuelve.</p></div>
+      <p>Elige "Apartar" en la prenda o en tu bolsa, envía tu anticipo y la guardamos una semana para ti. Si no liquidas en 7 días, la prenda vuelve a la venta y el anticipo no se devuelve. <a href="#politicas">Ver políticas de venta</a></p></div>
   </section>
 
   <section class="section wrap" id="entregas" aria-labelledby="delH">
@@ -334,6 +342,60 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
       <div class="dcard soon"><span class="k">Próximamente</span><b>Envíos a otras ciudades</b><p>Por ahora atendemos San Cristóbal. Si estás fuera, escríbenos y lo platicamos.</p></div>
     </div>
   </section>
+</main>
+
+<main id="politicas" class="page" hidden>
+  <div class="wrap">
+    <a class="back" href="#inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Volver a la tienda</a>
+    <span class="eyebrow page-eyebrow">AIDA LINE</span>
+    <h1 class="page-title">Políticas de venta</h1>
+    <p class="page-lead">Así funcionan la garantía, los apartados, los pagos y las entregas. Léelas antes de comprar.</p>
+
+    <section class="pol" aria-labelledby="polGar">
+      <h2 id="polGar">Garantía de 2 días</h2>
+      <p>Revisamos cada prenda antes de venderla. Si la tuya tiene una <b>mancha, descostura o rotura</b> que no te avisamos, te la cambiamos por otra prenda o te devolvemos tu dinero.</p>
+      <ol class="steps">
+        <li><b>Revísala el mismo día</b><span>Revisa tu prenda en cuanto la recibas.</span></li>
+        <li><b>Avísanos el mismo día</b><span>Escríbenos por WhatsApp ese mismo día con fotos del detalle.</span></li>
+        <li><b>Regrésala en 2 días</b><span>Entrégala en el mismo punto donde la recibiste, dentro de los 2 días contando el día que la recibiste.</span></li>
+      </ol>
+      <p class="callout">La garantía empieza el día que recibes tu prenda y dura 2 días. Ejemplo: si la recibes el lunes, avísanos el lunes y regrésala a más tardar el martes.</p>
+      <p><b>La garantía no aplica si:</b></p>
+      <ul>
+        <li>El detalle ya estaba indicado en la descripción o se veía en la foto real.</li>
+        <li>La prenda se usó o se lavó después de recibirla.</li>
+        <li>No nos avisaste el mismo día o pasaron más de 2 días.</li>
+      </ul>
+    </section>
+
+    <section class="pol" aria-labelledby="polAp">
+      <h2 id="polAp">Apartados</h2>
+      <ul>
+        <li>Aparta cualquier prenda con el <b>50% de anticipo</b>.</li>
+        <li>Tienes <b>7 días</b> para liquidar, contando desde que confirmamos tu anticipo.</li>
+        <li>Si no liquidas a tiempo, la prenda vuelve a la venta y <b>el anticipo no se devuelve</b>.</li>
+      </ul>
+    </section>
+
+    <section class="pol" aria-labelledby="polPago">
+      <h2 id="polPago">Pagos y piezas únicas</h2>
+      <ul>
+        <li>Cada prenda es pieza única. Al recibir tu pedido te confirmamos por WhatsApp si sigue disponible.</li>
+        <li>Pagas en efectivo o transferencia al recibir, o con tu anticipo si la apartaste.</li>
+      </ul>
+    </section>
+
+    <section class="pol" aria-labelledby="polEnt">
+      <h2 id="polEnt">Entregas</h2>
+      <ul>
+        <li>Punto de entrega en el Centro de San Cristóbal: gratis.</li>
+        <li>A domicilio dentro de San Cristóbal: $35 MXN.</li>
+        <li>Envíos a otras ciudades: próximamente. Escríbenos y lo platicamos.</li>
+      </ul>
+    </section>
+
+    <a class="btn btn-dark page-cta" href="#catalogo">Ver prendas</a>
+  </div>
 </main>
 
 <main id="proceso" class="page" hidden>
@@ -358,6 +420,7 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
     <span class="logo">AIDA LINE</span>
     <span>Ropa de paca seleccionada · San Cristóbal de las Casas, Chiapas</span>
     <a class="foot-link" href="#proceso">Así preparamos cada prenda</a>
+    <a class="foot-link" href="#politicas">Políticas de venta y garantía</a>
     <span>WhatsApp: <span class="phone" id="phoneTxt"></span></span>
   </div>
 </footer>
@@ -563,7 +626,8 @@ function openDetail(id){
       <dt>Calidad</dt><dd>${TIERS[p.tier].label}: ${TIERS[p.tier].desc}</dd>
     </dl>
     <p class="ap-hint">¿No puedes pagarla toda hoy? Apártala con <strong>${money(anticipo(p.price))}</strong> (${STORE.apartado.porcentaje}%) y liquídala en ${STORE.apartado.dias} días.</p>
-    <p class="note">Prenda revisada, lavada, desinfectada y planchada. Si quieres medidas exactas o más fotos, pídelas al enviar tu pedido.</p>`;
+    <p class="note">Prenda revisada, lavada, desinfectada y planchada. Si quieres medidas exactas o más fotos, pídelas al enviar tu pedido.</p>
+    <p class="note"><b>Garantía de 2 días</b> contra manchas, descosturas o roturas que no te hayamos avisado. Revisa tu prenda y avísanos el mismo día que la recibas. <a href="#politicas">Ver políticas</a></p>`;
   syncAddBtn(); show($("#detail"));
   const tr = $("#galTrack"); if (tr) tr.addEventListener("scroll", ()=>{ clearTimeout(tr._t); tr._t=setTimeout(syncThumbs,60); });
 }
@@ -596,7 +660,7 @@ function renderMenu(){
     <div class="m-group"><span class="m-label">Información</span>
       <a class="m-item" href="#proceso"><span>Así preparamos cada prenda</span>${chev}</a>
       <a class="m-item" href="#como-comprar"><span>Cómo comprar</span>${chev}</a>
-      <a class="m-item" href="#apartados"><span>Apartados</span>${chev}</a>
+      <a class="m-item" href="#politicas"><span>Políticas de venta y garantía</span>${chev}</a>
       <a class="m-item" href="#entregas"><span>Entregas</span>${chev}</a></div>
     <div class="m-contact">WhatsApp: <span class="phone">${STORE.whatsappLabel}</span></div>`;
 }
@@ -670,6 +734,7 @@ function renderBag(){
     <span class="err" id="bagErr" hidden></span>
     <a class="btn btn-wa" id="sendWa" href="#" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/></svg>${form.pay==="apartar" ? "Apartar por WhatsApp" : "Enviar pedido por WhatsApp"}</a>
+    <p class="terms">Al enviar tu pedido aceptas nuestras <a href="#politicas">políticas de venta y garantía</a>.</p>
     <div class="copy-row">¿No se abre WhatsApp? <button class="linkish" id="copyOrder">Copiar pedido</button> y mándalo a <span class="phone">${STORE.whatsappLabel}</span></div>`;
   updateWaHref();
 }
@@ -694,7 +759,7 @@ document.addEventListener("click", e => {
     state.gender=t.dataset.g; if ((state.gender==="accesorios")!==was) state.type="todo";
     renderRails(); renderGrid(); toShop();
     const rail=$("#genderRail"), on=rail.querySelector('[aria-pressed="true"]'); rail.scrollTo({left:Math.max(0,on.offsetLeft-rail.offsetLeft-16), behavior:"smooth"});
-    if ($("#proceso").hidden) document.getElementById("catalogo").scrollIntoView({behavior:"smooth"}); }
+    if (!$("#inicio").hidden) document.getElementById("catalogo").scrollIntoView({behavior:"smooth"}); }
   else if (t.dataset.t){ state.type=t.dataset.t;
     if (t.dataset.t!=="todo" && ACC_TYPES.includes(t.dataset.t)!==(state.gender==="accesorios")) state.gender = ACC_TYPES.includes(t.dataset.t) ? "accesorios" : "todo";
     renderRails(); renderGrid(); }
@@ -721,7 +786,7 @@ document.addEventListener("click", e => {
   }
   if (inMenu && (t.dataset.g || t.dataset.t || t.dataset.tier)){
     hide();
-    if ($("#proceso").hidden) document.getElementById("catalogo").scrollIntoView(); else location.hash = "#catalogo";
+    if (!$("#inicio").hidden) document.getElementById("catalogo").scrollIntoView(); else location.hash = "#catalogo";
   }
 });
 function fallbackCopy(text){
@@ -742,17 +807,18 @@ $("#scrim").addEventListener("click", ()=>hide());
 document.addEventListener("keydown", e => { if(e.key==="Escape") hide(); });
 
 /* ===== Páginas: tienda (#inicio) y proceso (#proceso) ===== */
+const PAGES = ["proceso","politicas"];
 function route(){
-  const onProc = location.hash === "#proceso";
-  $("#inicio").hidden = onProc;
-  $("#proceso").hidden = !onProc;
+  const page = PAGES.find(id => location.hash === "#"+id);
+  $("#inicio").hidden = !!page;
+  PAGES.forEach(id => { $("#"+id).hidden = id !== page; });
   hide();
-  if (onProc) { window.scrollTo(0,0); return; }
+  if (page) { window.scrollTo(0,0); return; }
   const el = location.hash && location.hash.length > 1 && document.getElementById(location.hash.slice(1));
   if (el && el.id !== "inicio") el.scrollIntoView(); else window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", route);
-function toShop(){ if (!$("#proceso").hidden) location.hash = "#catalogo"; }
+function toShop(){ if ($("#inicio").hidden) location.hash = "#catalogo"; }
 
 $("#phoneTxt").textContent = STORE.whatsappLabel;
 $("#fab").href = waLink(`Hola ${STORE.name}, tengo una pregunta.`);
