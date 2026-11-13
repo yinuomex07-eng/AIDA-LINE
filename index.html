@@ -131,7 +131,6 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .card:hover .ph svg.g{transform:scale(1.04)}
 .ph img.photo,.line .mini img.photo{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
 .card:hover .ph img.photo{transform:scale(1.03)}
-.badge.real-mini{position:absolute;left:8px;bottom:8px;background:var(--ink);color:var(--bg)}
 .gal{display:grid;gap:8px;width:min(100%,340px);margin-inline:auto}
 .gal-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:14px;background:var(--tile);scrollbar-width:none}
 .gal-track::-webkit-scrollbar{display:none}
@@ -484,7 +483,6 @@ function renderGrid(){
     <button class="card ${state.bag.includes(p.id)?"sold":""}" data-id="${p.id}" aria-label="${p.name}, ${money(p.price)}">
       <div class="ph">${garment(p)}
         <div class="badges">${p.nuevo?'<span class="badge new">Nuevo</span>':""}<span class="badge">Pieza única</span></div>
-        ${p.real!=null?'<span class="badge real-mini">Con foto real</span>':""}
       </div>
       <span class="tier-tag ${p.tier}">${TIERS[p.tier].label}</span>
       <h3>${p.name}</h3>
