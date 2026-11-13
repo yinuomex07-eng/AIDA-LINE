@@ -129,6 +129,21 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .ph{position:relative;aspect-ratio:3/4;max-width:100%;border-radius:12px;background:var(--tile);overflow:hidden;display:grid;place-items:center}
 .ph svg.g{width:74%;height:auto;transition:transform .35s ease}
 .card:hover .ph svg.g{transform:scale(1.04)}
+.ph img.photo,.line .mini img.photo{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+.card:hover .ph img.photo{transform:scale(1.03)}
+.badge.real-mini{position:absolute;left:8px;bottom:8px;background:var(--ink);color:var(--bg)}
+.gal{display:grid;gap:8px;width:min(100%,340px);margin-inline:auto}
+.gal-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:14px;background:var(--tile);scrollbar-width:none}
+.gal-track::-webkit-scrollbar{display:none}
+.gal-slide{flex:0 0 100%;aspect-ratio:3/4;max-width:100%;scroll-snap-align:start;position:relative}
+.gal-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-slide .badge{position:absolute;left:8px;bottom:8px}
+.badge.real{background:var(--ink);color:var(--bg)}
+.gal-thumbs{display:flex;gap:8px;justify-content:center}
+.gal-th{width:52px;aspect-ratio:3/4;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:var(--tile)}
+.gal-th[aria-current="true"]{border-color:var(--ink)}
+.gal-th img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-cap{margin:0;font-size:12.5px;color:var(--muted);text-align:center}
 .badges{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;flex-wrap:wrap}
 .badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--surface);color:var(--ink)}
 .badge.new{background:var(--accent);color:var(--accent-ink)}
@@ -194,7 +209,7 @@ footer .logo{justify-self:start;font-size:15px}
 .note{font-size:13px;color:var(--muted);background:var(--tile);border-radius:10px;padding:10px 12px}
 
 .line{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center}
-.line .mini{width:64px;height:80px;border-radius:10px;background:var(--tile);display:grid;place-items:center}
+.line .mini{width:64px;height:80px;overflow:hidden;border-radius:10px;background:var(--tile);display:grid;place-items:center}
 .line .mini svg{width:78%;height:auto}
 .line b{display:block;font-size:14px;line-height:1.3}
 .line span{font-size:12.5px;color:var(--muted)}
@@ -361,10 +376,17 @@ const TIERS = {
   premium: { label: "Premium",    color: "var(--t-premium)", desc: "Marcas reconocidas, algunas con etiqueta." }
 };
 const GENDERS = [["todo","Todo"],["mujer","Mujer"],["hombre","Hombre"],["ninos","Niñas y niños"]];
-const TYPES = {todo:"Todas",chamarra:"Chamarras",sudadera:"Sudaderas",sueter:"Suéteres",camisa:"Camisas",playera:"Playeras y blusas",vestido:"Vestidos",falda:"Faldas",jeans:"Jeans",short:"Shorts"};
+const TYPES = {todo:"Todas",chamarra:"Chamarras",sudadera:"Sudaderas",sueter:"Suéteres",camisa:"Camisas",playera:"Playeras y blusas",vestido:"Vestidos",enterizo:"Enterizos",falda:"Faldas",jeans:"Jeans",short:"Shorts"};
 
 /* Prendas de ejemplo: reemplaza con tu inventario real. Cuando tengas fotos, agrega  foto: "fotos/archivo.jpg" */
 const PRODUCTS = [
+  /* Prendas reales con fotos: "fotos" es la galería y "real" indica cuál es la foto real (0 = la primera) */
+  {id:23, name:"Vestido blanco floral con fruncido", brand:"Sin marca", type:"vestido", tier:"primera", gender:"mujer", size:"M", price:220, color:"#f3f1ea", cond:"Muy bueno", nuevo:true,
+   fotos:["fotos/vestido-floral-1.jpg","fotos/vestido-floral-2.jpg","fotos/vestido-floral-real.jpg"], real:2},
+  {id:22, name:"Enterizo corto de lunares", brand:"Bershka", type:"enterizo", tier:"primera", gender:"mujer", size:"S (MX 26)", price:260, color:"#f2f2f2", cond:"Muy bueno", nuevo:true,
+   fotos:["fotos/enterizo-lunares-1.jpg","fotos/enterizo-lunares-2.jpg","fotos/enterizo-lunares-real.jpg"], real:2},
+  {id:21, name:"Camisola satinada con encaje", brand:"Sin marca", type:"playera", tier:"primera", gender:"mujer", size:"M", price:180, color:"#d9c8b8", cond:"Muy bueno", nuevo:true,
+   fotos:["fotos/camisola-encaje-1.jpg","fotos/camisola-encaje-2.jpg","fotos/camisola-encaje-real.jpg"], real:2},
   {id:1, name:"Chamarra de mezclilla clásica", brand:"Levi's", type:"chamarra", tier:"premium", gender:"hombre", size:"M", price:420, color:"#4a6fa5", cond:"Como nueva", nuevo:true},
   {id:2, name:"Sudadera con gorro", brand:"Nike", type:"sudadera", tier:"premium", gender:"mujer", size:"L", price:380, color:"#3a3f4b", cond:"Excelente", nuevo:true},
   {id:3, name:"Vestido floral midi", brand:"Zara", type:"vestido", tier:"primera", gender:"mujer", size:"S", price:220, color:"#c86b85", cond:"Como nuevo", nuevo:true},
@@ -397,7 +419,8 @@ const SHAPES = {
   jeans:"M29 10 H71 L75 92 H56 L50 36 L44 92 H25 Z",
   short:"M27 24 H73 L78 70 H55 L50 46 L45 70 H22 Z",
   vestido:"M40 10 L44 10 Q50 19 56 10 L60 10 L62 34 L78 92 H22 L38 34 Z",
-  falda:"M33 24 H67 L80 84 H20 Z"
+  falda:"M33 24 H67 L80 84 H20 Z",
+  enterizo:"M34 14 L44 12 Q50 18 56 12 L66 14 L74 26 L68 31 L68 50 L75 84 H54 L50 60 L46 84 H25 L32 50 L32 31 L26 26 Z"
 };
 const DETAILS = {
   camisa:'<path d="M50 21 V92" /><circle cx="50" cy="40" r="1.4"/><circle cx="50" cy="55" r="1.4"/><circle cx="50" cy="70" r="1.4"/>',
@@ -411,7 +434,8 @@ const DETAILS = {
   playera:''
 };
 function garment(p){
-  if (p.foto) return `<img src="${p.foto}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`;
+  const src = p.fotos ? p.fotos[0] : p.foto;
+  if (src) return `<img class="photo" src="${src}" alt="" loading="lazy">`;
   return `<svg class="g" viewBox="0 0 100 100" aria-hidden="true">
     <path d="${SHAPES[p.type]}" fill="${p.color}" stroke="rgba(0,0,0,.28)" stroke-width="1.2" stroke-linejoin="round"/>
     <g fill="none" stroke="rgba(0,0,0,.3)" stroke-width="1.2" stroke-linecap="round">${DETAILS[p.type]||""}</g>
@@ -460,6 +484,7 @@ function renderGrid(){
     <button class="card ${state.bag.includes(p.id)?"sold":""}" data-id="${p.id}" aria-label="${p.name}, ${money(p.price)}">
       <div class="ph">${garment(p)}
         <div class="badges">${p.nuevo?'<span class="badge new">Nuevo</span>':""}<span class="badge">Pieza única</span></div>
+        ${p.real!=null?'<span class="badge real-mini">Con foto real</span>':""}
       </div>
       <span class="tier-tag ${p.tier}">${TIERS[p.tier].label}</span>
       <h3>${p.name}</h3>
@@ -488,7 +513,7 @@ function hide(keepScrim){
 function openDetail(id){
   const p = PRODUCTS.find(x=>x.id===id); current = p;
   $("#dBody").innerHTML = `
-    <div class="d-ph">${garment(p)}<div class="badges"><span class="badge">Pieza única</span></div></div>
+    ${gallery(p)}
     <div><span class="tier-tag ${p.tier}">${TIERS[p.tier].label}</span>
       <div class="d-title" id="dTitle">${p.name}</div></div>
     <div class="d-price">${money(p.price)} <small style="font-size:13px;font-weight:600;color:var(--muted)">MXN</small></div>
@@ -500,6 +525,20 @@ function openDetail(id){
     </dl>
     <p class="note">Prenda revisada, lavada, desinfectada y planchada. Si quieres medidas exactas o más fotos, pídelas al enviar tu pedido.</p>`;
   syncAddBtn(); show($("#detail"));
+  const tr = $("#galTrack"); if (tr) tr.addEventListener("scroll", ()=>{ clearTimeout(tr._t); tr._t=setTimeout(syncThumbs,60); });
+}
+function gallery(p){
+  if (!p.fotos) return `<div class="d-ph">${garment(p)}<div class="badges"><span class="badge">Pieza única</span></div></div>`;
+  return `<div class="gal">
+    <div class="gal-track" id="galTrack">${p.fotos.map((f,i)=>`<div class="gal-slide"><img src="${f}" alt="${p.name}, foto ${i+1} de ${p.fotos.length}" ${i?'loading="lazy"':''}>${i===p.real?'<span class="badge real">Foto real de la prenda</span>':''}</div>`).join("")}</div>
+    <div class="gal-thumbs">${p.fotos.map((f,i)=>`<button class="gal-th" data-slide="${i}" aria-label="Ver foto ${i+1}${i===p.real?' (foto real)':''}" aria-current="${i===0}"><img src="${f}" alt=""></button>`).join("")}</div>
+    ${p.real!=null?'<p class="gal-cap">Las fotos con modelo son de referencia. La foto marcada como real es la pieza que recibes.</p>':''}
+  </div>`;
+}
+function syncThumbs(){
+  const tr = $("#galTrack"); if(!tr) return;
+  const i = Math.round(tr.scrollLeft / tr.clientWidth);
+  document.querySelectorAll(".gal-th").forEach((b,k)=>b.setAttribute("aria-current", String(k===i)));
 }
 function syncAddBtn(){
   const inBag = current && state.bag.includes(current.id);
@@ -571,7 +610,8 @@ function validOrder(){
 /* ===== Eventos ===== */
 document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if(!t) return;
-  if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); toShop(); }
+  if (t.dataset.slide){ const tr=$("#galTrack"); tr.scrollTo({left:+t.dataset.slide*tr.clientWidth, behavior:"smooth"}); }
+  else if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); toShop(); }
   else if (t.dataset.t){ state.type=t.dataset.t; renderRails(); renderGrid(); }
   else if (t.dataset.tier){ state.tier = state.tier===t.dataset.tier ? null : t.dataset.tier; renderRails(); renderGrid();
     document.getElementById("catalogo").scrollIntoView(); }
