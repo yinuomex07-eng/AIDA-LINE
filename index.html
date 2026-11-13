@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>AIDA LINE</title>
+<meta name="description" content="AIDA LINE: ropa de paca seleccionada en San Cristóbal de las Casas. Básicas, de primera y premium. Pide por WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: tienda móvil primero — cabecera fija, filtros en carril horizontal, cuadrícula de 2 columnas que crece a 4; carrito en panel inferior. */
+:root{
+  --bg:#fbfaf8;
+  --surface:#ffffff;
+  --ink:#1b1820;
+  --muted:#6d6774;
+  --line:#e9e5ec;
+  --tile:#f1eef3;
+  --accent:#b8236b;          /* fucsia de bordado */
+  --accent-ink:#ffffff;
+  --accent-soft:#f8e3ee;
+  --wa:#1f9d55;
+  --t-basica:#4f6d7a;
+  --t-primera:#7a4fb0;
+  --t-premium:#9a6a12;
+  --t-premium-bg:#f6ecd6;
+  --shadow:0 10px 30px rgba(27,24,32,.12);
+  --display:"Archivo","Arial Black",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141217;--surface:#1d1a21;--ink:#f2eff4;--muted:#a59fac;--line:#2e2a33;--tile:#25212a;
+    --accent:#ec5c9f;--accent-ink:#1a0d14;--accent-soft:#3a1f2d;--wa:#35c274;
+    --t-basica:#8fb3c2;--t-primera:#b996e6;--t-premium:#e6b862;--t-premium-bg:#3a2f1a;
+    --shadow:0 10px 30px rgba(0,0,0,.45);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141217;--surface:#1d1a21;--ink:#f2eff4;--muted:#a59fac;--line:#2e2a33;--tile:#25212a;
+  --accent:#ec5c9f;--accent-ink:#1a0d14;--accent-soft:#3a1f2d;--wa:#35c274;
+  --t-basica:#8fb3c2;--t-primera:#b996e6;--t-premium:#e6b862;--t-premium-bg:#3a2f1a;
+  --shadow:0 10px 30px rgba(0,0,0,.45);color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--surface)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Barra de aviso */
+.notice{background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:600;letter-spacing:.02em;text-align:center}
+.notice .wrap{padding-block:7px}
+
+/* Cabecera */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;padding-block:10px}
+.logo{justify-self:center;font-family:var(--display);font-weight:800;font-stretch:112%;letter-spacing:.42em;font-size:17px;margin-right:-.42em;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:0;background:transparent;border-radius:12px;position:relative}
+.icon-btn:hover{background:var(--tile)}
+.icon-btn svg{width:23px;height:23px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.count{position:absolute;top:4px;right:3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.search{display:flex;align-items:center;gap:8px;background:var(--tile);border-radius:999px;padding:0 14px;height:42px;margin-bottom:10px}
+.search svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+.search input{border:0;background:transparent;outline:none;width:100%;min-width:0;font-size:15px}
+.search input::placeholder{color:var(--muted)}
+
+/* Carriles de chips */
+.rail{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:10px;margin-inline:-4px;padding-inline:4px}
+.rail::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+
+/* Portada */
+.hero{padding-block:22px 6px}
+.hero-card{position:relative;overflow:hidden;border-radius:20px;background:var(--accent);color:var(--accent-ink);padding:26px 22px 22px;display:grid;gap:14px}
+.hero-card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;
+  background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(255,255,255,.35) 6px 9px);opacity:.9}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.hero h1{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:clamp(28px,7.4vw,46px);line-height:1.02;letter-spacing:-.01em;max-width:16ch}
+.hero p{margin:0;max-width:44ch;font-size:15.5px;opacity:.92}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;padding-bottom:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14.5px;text-decoration:none}
+.btn-light{background:var(--surface);color:var(--ink)}
+.btn-ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
+.btn-dark{background:var(--ink);color:var(--bg);width:100%}
+.btn-wa{background:var(--wa);color:#fff;width:100%}
+.btn svg{width:18px;height:18px;fill:currentColor}
+
+/* Niveles */
+.section{padding-block:26px 6px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sec-head h2{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:20px;letter-spacing:.01em}
+.sec-head span{color:var(--muted);font-size:13px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tier{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px 12px;text-align:left;display:grid;gap:4px;align-content:start}
+.tier[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tier b{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:14px;letter-spacing:.02em}
+.tier .from{font-size:12.5px;color:var(--muted)}
+.tier .from strong{color:var(--ink);font-variant-numeric:tabular-nums}
+.tier small{font-size:12px;color:var(--muted);line-height:1.35}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-bottom:4px}
+@media (max-width:520px){
+  .tiers{grid-template-columns:1fr}
+  .tier{grid-template-columns:auto 1fr auto;align-items:center;gap:2px 10px;padding:12px 14px}
+  .tier .dot{grid-row:span 2;margin:0}
+  .tier small{grid-column:2/4}
+  .tier .from{grid-row:1;grid-column:3;justify-self:end}
+}
+
+/* Catálogo */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.toolbar .results{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.select{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}
+@media (min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1000px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.card{display:grid;gap:6px;min-width:0;text-align:left;border:0;background:transparent;padding:0}
+.ph{position:relative;aspect-ratio:3/4;max-width:100%;border-radius:12px;background:var(--tile);overflow:hidden;display:grid;place-items:center}
+.ph svg.g{width:74%;height:auto;transition:transform .35s ease}
+.card:hover .ph svg.g{transform:scale(1.04)}
+.badges{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--surface);color:var(--ink)}
+.badge.new{background:var(--accent);color:var(--accent-ink)}
+.tier-tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tier-tag.basica{color:var(--t-basica)}.tier-tag.primera{color:var(--t-primera)}.tier-tag.premium{color:var(--t-premium)}
+.card h3{font-size:14px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.meta{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.price{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.size{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.sold .ph::after{content:"En tu bolsa";position:absolute;inset:auto 8px 8px;background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;text-align:center;padding:6px;border-radius:8px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 10px;border:1px dashed var(--line);border-radius:var(--r)}
+
+/* Cómo comprar + entregas */
+.steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:34px 1fr;gap:4px 12px}
+.steps li::before{content:counter(s);grid-row:span 2;width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center}
+.steps.process{grid-template-columns:repeat(2,minmax(0,1fr))}
+.steps.process li{grid-template-columns:1fr;padding:14px}
+.steps.process li::before{grid-row:auto;width:30px;height:30px;font-size:14px;margin-bottom:6px}
+@media (min-width:860px){.steps.process{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.steps b{font-size:15px}.steps span{font-size:13.5px;color:var(--muted)}
+.delivery{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.dcard{border-radius:var(--r);padding:16px;background:var(--surface);border:1px solid var(--line);display:grid;gap:4px}
+.dcard .k{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.dcard b{font-size:16px}
+.dcard p{margin:0;font-size:13.5px;color:var(--muted)}
+.dcard.soon{background:transparent;border-style:dashed}
+
+footer{margin-top:34px;border-top:1px solid var(--line);background:var(--surface)}
+footer .wrap{padding-block:26px 34px;display:grid;gap:10px;font-size:13.5px;color:var(--muted)}
+footer .logo{justify-self:start;font-size:15px}
+.phone{font-weight:700;color:var(--ink);user-select:all;font-variant-numeric:tabular-nums}
+
+/* Botón flotante WhatsApp */
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;width:56px;height:56px;border-radius:50%;background:var(--wa);color:#fff;display:grid;place-items:center;box-shadow:var(--shadow);text-decoration:none}
+.fab svg{width:28px;height:28px;fill:#fff}
+
+/* Paneles (detalle y bolsa) */
+.scrim{position:fixed;inset:0;background:rgba(10,8,12,.45);z-index:70;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:80;background:var(--surface);border-radius:20px 20px 0 0;max-height:min(92vh,92dvh);display:flex;flex-direction:column;transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:var(--shadow);
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet.on{transform:none}
+@media (min-width:760px){.sheet{left:auto;top:0;bottom:0;width:440px;max-height:none;border-radius:0;transform:translateX(105%)}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.sheet-head h2{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:17px}
+.sheet-body{overflow-y:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px;align-content:start}
+.sheet-foot{padding:12px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);display:grid;gap:10px}
+.d-ph{aspect-ratio:1/1;max-width:100%;border-radius:14px;background:var(--tile);display:grid;place-items:center;position:relative}
+.d-ph svg.g{width:58%;height:auto}
+.d-title{font-size:19px;font-weight:700;line-height:1.25}
+.d-price{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.specs{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;font-size:14px}
+.specs dt{color:var(--muted)}.specs dd{margin:0;font-weight:600}
+.note{font-size:13px;color:var(--muted);background:var(--tile);border-radius:10px;padding:10px 12px}
+
+.line{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center}
+.line .mini{width:64px;height:80px;border-radius:10px;background:var(--tile);display:grid;place-items:center}
+.line .mini svg{width:78%;height:auto}
+.line b{display:block;font-size:14px;line-height:1.3}
+.line span{font-size:12.5px;color:var(--muted)}
+.line .rm{border:0;background:transparent;color:var(--muted);font-size:12.5px;text-decoration:underline;padding:4px}
+.totals{display:grid;gap:4px;font-size:14px}
+.totals div{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.totals .grand{font-weight:800;font-size:17px;padding-top:6px;border-top:1px solid var(--line);margin-top:4px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-weight:700;font-size:14px;margin-bottom:8px;padding:0}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px}
+.opt:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opt input{margin-top:3px;accent-color:var(--accent)}
+.opt small{display:block;color:var(--muted);font-size:12.5px}
+.opt .fee{margin-left:auto;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+label.field{display:grid;gap:5px;font-size:13px;font-weight:600}
+label.field input,label.field textarea{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;font-size:15px;font-weight:400;width:100%}
+.err{color:var(--accent);font-size:13px;font-weight:600}
+.copy-row{display:flex;gap:8px;align-items:center;justify-content:center;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.linkish{border:0;background:transparent;color:var(--ink);font-weight:700;text-decoration:underline;padding:2px}
+.empty-bag{text-align:center;color:var(--muted);padding:30px 0;display:grid;gap:12px;justify-items:center}
+
+.toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top,0px));transform:translate(-50%,-12px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:90;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div class="notice"><div class="wrap">Entregas en San Cristóbal de las Casas · Pide por WhatsApp</div></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <a class="icon-btn" href="#como-comprar" aria-label="Cómo comprar">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.6-.8 1.1v.5M12 17h.01"/></svg>
+      </a>
+      <a class="logo" href="#inicio">AIDA LINE</a>
+      <button class="icon-btn" id="openBag" aria-label="Abrir bolsa">
+        <svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="count" id="bagCount" hidden>0</span>
+      </button>
+    </div>
+    <label class="search" for="q">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="sr">Buscar</span>
+      <input id="q" type="search" placeholder="Busca jeans, chamarras, vestidos…" autocomplete="off">
+    </label>
+    <div class="rail" id="genderRail" role="group" aria-label="Departamento"></div>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero wrap">
+    <div class="hero-card">
+      <span class="eyebrow">Ropa de paca · San Cristóbal de las Casas</span>
+      <h1>Ropa de paca, escogida prenda por prenda.</h1>
+      <p>Cada pieza se revisa, se lava, se desinfecta y se plancha antes de llegar a ti. Aparta lo que te guste y te lo entregamos en la ciudad.</p>
+      <div class="hero-actions">
+        <a class="btn btn-light" href="#catalogo">Ver prendas</a>
+        <a class="btn btn-ghost" href="#entregas">Cómo entregamos</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="tiersH">
+    <div class="sec-head"><h2 id="tiersH">Elige tu calidad</h2><span>Toca para filtrar</span></div>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <section class="section wrap" id="proceso" aria-labelledby="procH">
+    <div class="sec-head"><h2 id="procH">Así preparamos cada prenda</h2></div>
+    <ol class="steps process">
+      <li><b>Se revisa</b><span>Costuras, cierres, botones y manchas, pieza por pieza.</span></li>
+      <li><b>Se lava</b><span>Lavado completo antes de salir a la venta.</span></li>
+      <li><b>Se desinfecta</b><span>Para que la estrenes con toda confianza.</span></li>
+      <li><b>Se plancha</b><span>Y se dobla lista para usar.</span></li>
+    </ol>
+  </section>
+
+  <section class="section wrap" id="catalogo" aria-labelledby="catH">
+    <div class="sec-head"><h2 id="catH">Recién llegadas</h2></div>
+    <div class="rail" id="typeRail" role="group" aria-label="Tipo de prenda"></div>
+    <div class="toolbar">
+      <span class="results" id="results"></span>
+      <label class="sr" for="sort">Ordenar</label>
+      <select class="select" id="sort">
+        <option value="new">Más nuevas</option>
+        <option value="asc">Menor precio</option>
+        <option value="desc">Mayor precio</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="section wrap" id="como-comprar" aria-labelledby="howH">
+    <div class="sec-head"><h2 id="howH">Cómo comprar</h2></div>
+    <ol class="steps">
+      <li><b>Agrega a tu bolsa</b><span>Cada prenda es pieza única: quien la aparta primero se la lleva.</span></li>
+      <li><b>Envía tu pedido por WhatsApp</b><span>Tu bolsa se convierte en un mensaje listo para mandar.</span></li>
+      <li><b>Confirmamos y entregamos</b><span>Te avisamos si la pieza sigue disponible y acordamos entrega y pago.</span></li>
+    </ol>
+  </section>
+
+  <section class="section wrap" id="entregas" aria-labelledby="delH">
+    <div class="sec-head"><h2 id="delH">Entregas</h2></div>
+    <div class="delivery">
+      <div class="dcard"><span class="k">Gratis</span><b>Punto de entrega en el Centro</b><p>Acordamos lugar y hora por WhatsApp. Pagas en efectivo o transferencia al recibir.</p></div>
+      <div class="dcard"><span class="k">$35 MXN</span><b>A domicilio en San Cristóbal</b><p>Llevamos tu pedido a tu colonia dentro de la ciudad, de lunes a sábado.</p></div>
+      <div class="dcard soon"><span class="k">Próximamente</span><b>Envíos a otras ciudades</b><p>Por ahora atendemos San Cristóbal. Si estás fuera, escríbenos y lo platicamos.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="logo">AIDA LINE</span>
+    <span>Ropa de paca seleccionada · San Cristóbal de las Casas, Chiapas</span>
+    <span>WhatsApp: <span class="phone" id="phoneTxt"></span></span>
+  </div>
+</footer>
+
+<a class="fab" id="fab" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
+</a>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true">
+  <div class="sheet-head"><h2>Detalle</h2><button class="icon-btn" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="sheet-body" id="dBody"></div>
+  <div class="sheet-foot"><button class="btn btn-dark" id="dAdd">Agregar a mi bolsa</button></div>
+</aside>
+
+<aside class="sheet" id="bag" role="dialog" aria-modal="true" aria-labelledby="bagH" aria-hidden="true">
+  <div class="sheet-head"><h2 id="bagH">Mi bolsa</h2><button class="icon-btn" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="sheet-body" id="bagBody"></div>
+  <div class="sheet-foot" id="bagFoot"></div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===== CONFIGURACIÓN DE LA TIENDA ===== */
+const STORE = {
+  name: "AIDA LINE",
+  whatsapp: "529671234567",          // NÚMERO DE EJEMPLO: cambia por el real (52 + 10 dígitos, sin espacios)
+  whatsappLabel: "+52 967 123 4567 (ejemplo)",
+  homeFee: 35
+};
+const TIERS = {
+  basica:  { label: "Básicas",    color: "var(--t-basica)",  desc: "Buen estado, uso diario. Precio bajo." },
+  primera: { label: "De primera", color: "var(--t-primera)", desc: "Como nuevas, sin detalles visibles." },
+  premium: { label: "Premium",    color: "var(--t-premium)", desc: "Marcas reconocidas, algunas con etiqueta." }
+};
+const GENDERS = [["todo","Todo"],["mujer","Mujer"],["hombre","Hombre"],["ninos","Niñas y niños"]];
+const TYPES = {todo:"Todas",chamarra:"Chamarras",sudadera:"Sudaderas",sueter:"Suéteres",camisa:"Camisas",playera:"Playeras y blusas",vestido:"Vestidos",falda:"Faldas",jeans:"Jeans",short:"Shorts"};
+
+/* Prendas de ejemplo: reemplaza con tu inventario real. Cuando tengas fotos, agrega  foto: "fotos/archivo.jpg" */
+const PRODUCTS = [
+  {id:1, name:"Chamarra de mezclilla clásica", brand:"Levi's", type:"chamarra", tier:"premium", gender:"hombre", size:"M", price:420, color:"#4a6fa5", cond:"Como nueva", nuevo:true},
+  {id:2, name:"Sudadera con gorro", brand:"Nike", type:"sudadera", tier:"premium", gender:"mujer", size:"L", price:380, color:"#3a3f4b", cond:"Excelente", nuevo:true},
+  {id:3, name:"Vestido floral midi", brand:"Zara", type:"vestido", tier:"primera", gender:"mujer", size:"S", price:220, color:"#c86b85", cond:"Como nuevo", nuevo:true},
+  {id:4, name:"Jeans rectos tiro medio", brand:"Gap", type:"jeans", tier:"primera", gender:"hombre", size:"32", price:240, color:"#34558b", cond:"Muy bueno", nuevo:true},
+  {id:5, name:"Playera básica blanca", brand:"Sin marca", type:"playera", tier:"basica", gender:"hombre", size:"M", price:60, color:"#ecebe4", cond:"Buen estado", nuevo:false},
+  {id:6, name:"Blusa manga corta mostaza", brand:"H&M", type:"playera", tier:"basica", gender:"mujer", size:"M", price:75, color:"#e0b260", cond:"Buen estado", nuevo:true},
+  {id:7, name:"Suéter tejido cuello redondo", brand:"Gap", type:"sueter", tier:"primera", gender:"mujer", size:"M", price:180, color:"#b5835a", cond:"Muy bueno", nuevo:false},
+  {id:8, name:"Falda plisada", brand:"Forever 21", type:"falda", tier:"basica", gender:"mujer", size:"S", price:90, color:"#6b4e71", cond:"Buen estado", nuevo:false},
+  {id:9, name:"Short de mezclilla", brand:"Old Navy", type:"short", tier:"basica", gender:"mujer", size:"28", price:85, color:"#7a9cc6", cond:"Buen estado", nuevo:false},
+  {id:10, name:"Camisa de franela a cuadros", brand:"Columbia", type:"camisa", tier:"primera", gender:"hombre", size:"L", price:190, color:"#a23b3b", cond:"Muy bueno", nuevo:true},
+  {id:11, name:"Chamarra rompevientos", brand:"The North Face", type:"chamarra", tier:"premium", gender:"hombre", size:"L", price:550, color:"#2e6b5e", cond:"Excelente", nuevo:false},
+  {id:12, name:"Sudadera infantil", brand:"Carter's", type:"sudadera", tier:"basica", gender:"ninos", size:"6 años", price:70, color:"#f2a65a", cond:"Buen estado", nuevo:true},
+  {id:13, name:"Jeans skinny tiro alto", brand:"American Eagle", type:"jeans", tier:"primera", gender:"mujer", size:"26", price:210, color:"#3c4f76", cond:"Como nuevo", nuevo:false},
+  {id:14, name:"Vestido negro ajustado", brand:"Calvin Klein", type:"vestido", tier:"premium", gender:"mujer", size:"M", price:320, color:"#26232a", cond:"Nuevo con etiqueta", nuevo:false},
+  {id:15, name:"Playera estampada", brand:"Old Navy", type:"playera", tier:"basica", gender:"ninos", size:"8 años", price:50, color:"#5aa9e6", cond:"Buen estado", nuevo:false},
+  {id:16, name:"Camisa de lino", brand:"Banana Republic", type:"camisa", tier:"premium", gender:"hombre", size:"M", price:290, color:"#d9cfb8", cond:"Excelente", nuevo:false},
+  {id:17, name:"Suéter de punto fino", brand:"Tommy Hilfiger", type:"sueter", tier:"premium", gender:"hombre", size:"L", price:340, color:"#1f3a5f", cond:"Excelente", nuevo:false},
+  {id:18, name:"Short deportivo", brand:"Adidas", type:"short", tier:"primera", gender:"hombre", size:"M", price:130, color:"#454b54", cond:"Muy bueno", nuevo:false},
+  {id:19, name:"Falda de mezclilla", brand:"Levi's", type:"falda", tier:"primera", gender:"mujer", size:"M", price:160, color:"#5f7fb0", cond:"Muy bueno", nuevo:false},
+  {id:20, name:"Chamarra acolchada infantil", brand:"Gap Kids", type:"chamarra", tier:"primera", gender:"ninos", size:"10 años", price:180, color:"#c94f4f", cond:"Como nueva", nuevo:true}
+];
+
+/* ===== Siluetas de prenda (se usan mientras no haya foto) ===== */
+const SHAPES = {
+  playera:"M30 18 L42 12 Q50 19 58 12 L70 18 L87 33 L77 43 L70 38 L70 90 L30 90 L30 38 L23 43 L13 33 Z",
+  camisa:"M32 16 L44 12 L50 21 L56 12 L68 16 L85 62 L76 65 L68 40 L68 92 L32 92 L32 40 L24 65 L15 62 Z",
+  sudadera:"M34 22 Q50 2 66 22 L80 28 L88 82 L78 84 L70 46 L70 92 L30 92 L30 46 L22 84 L12 82 L20 28 Z",
+  sueter:"M36 16 Q50 25 64 16 L80 26 L88 82 L78 84 L70 44 L70 92 L30 92 L30 44 L22 84 L12 82 L20 26 Z",
+  chamarra:"M32 15 L44 11 L50 19 L56 11 L68 15 L86 30 L88 84 L78 86 L71 44 L71 92 L29 92 L29 44 L22 86 L12 84 L14 30 Z",
+  jeans:"M29 10 H71 L75 92 H56 L50 36 L44 92 H25 Z",
+  short:"M27 24 H73 L78 70 H55 L50 46 L45 70 H22 Z",
+  vestido:"M40 10 L44 10 Q50 19 56 10 L60 10 L62 34 L78 92 H22 L38 34 Z",
+  falda:"M33 24 H67 L80 84 H20 Z"
+};
+const DETAILS = {
+  camisa:'<path d="M50 21 V92" /><circle cx="50" cy="40" r="1.4"/><circle cx="50" cy="55" r="1.4"/><circle cx="50" cy="70" r="1.4"/>',
+  chamarra:'<path d="M50 19 V92"/><path d="M34 60 H44 M56 60 H66"/>',
+  sudadera:'<path d="M38 68 H62 L58 82 H42 Z"/><path d="M46 24 L45 36 M54 24 L55 36"/>',
+  jeans:'<path d="M29 18 H71"/><path d="M33 18 Q36 28 44 26"/>',
+  short:'<path d="M27 32 H73"/>',
+  falda:'<path d="M33 32 H67"/><path d="M42 32 L38 84 M50 32 V84 M58 32 L62 84"/>',
+  sueter:'<path d="M30 86 H70 M22 80 L12 78 M78 80 L88 78"/>',
+  vestido:'<path d="M38 34 H62"/>',
+  playera:''
+};
+function garment(p){
+  if (p.foto) return `<img src="${p.foto}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`;
+  return `<svg class="g" viewBox="0 0 100 100" aria-hidden="true">
+    <path d="${SHAPES[p.type]}" fill="${p.color}" stroke="rgba(0,0,0,.28)" stroke-width="1.2" stroke-linejoin="round"/>
+    <g fill="none" stroke="rgba(0,0,0,.3)" stroke-width="1.2" stroke-linecap="round">${DETAILS[p.type]||""}</g>
+  </svg>`;
+}
+
+/* ===== Estado ===== */
+const $ = s => document.querySelector(s);
+const money = n => "$" + n.toLocaleString("es-MX") ;
+const state = {gender:"todo", tier:null, type:"todo", q:"", sort:"new", bag:[]};
+try { state.bag = JSON.parse(localStorage.getItem("aida-bag")||"[]").filter(id=>PRODUCTS.some(p=>p.id===id)); } catch(e){}
+const saveBag = () => { try{ localStorage.setItem("aida-bag", JSON.stringify(state.bag)); }catch(e){} };
+const waLink = text => `https://wa.me/${STORE.whatsapp}` + (text ? `?text=${encodeURIComponent(text)}` : "");
+
+/* ===== Render ===== */
+function renderRails(){
+  $("#genderRail").innerHTML = GENDERS.map(([k,l]) =>
+    `<button class="chip" data-g="${k}" aria-pressed="${state.gender===k}">${l}</button>`).join("");
+  $("#typeRail").innerHTML = Object.entries(TYPES).map(([k,l]) =>
+    `<button class="chip" data-t="${k}" aria-pressed="${state.type===k}">${l}</button>`).join("");
+  $("#tiers").innerHTML = Object.entries(TIERS).map(([k,t]) => {
+    const min = Math.min(...PRODUCTS.filter(p=>p.tier===k).map(p=>p.price));
+    return `<button class="tier" data-tier="${k}" aria-pressed="${state.tier===k}">
+      <span class="dot" style="background:${t.color}"></span>
+      <b>${t.label}</b>
+      <span class="from">desde <strong>${money(min)}</strong></span>
+      <small>${t.desc}</small></button>`;
+  }).join("");
+}
+function filtered(){
+  const q = state.q.trim().toLowerCase();
+  let list = PRODUCTS.filter(p =>
+    (state.gender==="todo" || p.gender===state.gender) &&
+    (!state.tier || p.tier===state.tier) &&
+    (state.type==="todo" || p.type===state.type) &&
+    (!q || (p.name+" "+p.brand+" "+TYPES[p.type]+" "+TIERS[p.tier].label).toLowerCase().includes(q)));
+  if (state.sort==="asc") list.sort((a,b)=>a.price-b.price);
+  else if (state.sort==="desc") list.sort((a,b)=>b.price-a.price);
+  else list.sort((a,b)=>(b.nuevo-a.nuevo)||(b.id-a.id));
+  return list;
+}
+function renderGrid(){
+  const list = filtered();
+  $("#results").textContent = list.length===1 ? "1 prenda" : `${list.length} prendas`;
+  $("#grid").innerHTML = list.length ? list.map(p => `
+    <button class="card ${state.bag.includes(p.id)?"sold":""}" data-id="${p.id}" aria-label="${p.name}, ${money(p.price)}">
+      <div class="ph">${garment(p)}
+        <div class="badges">${p.nuevo?'<span class="badge new">Nuevo</span>':""}<span class="badge">Pieza única</span></div>
+      </div>
+      <span class="tier-tag ${p.tier}">${TIERS[p.tier].label}</span>
+      <h3>${p.name}</h3>
+      <div class="meta"><span class="price">${money(p.price)}</span><span class="size">Talla ${p.size}</span></div>
+    </button>`).join("")
+    : `<div class="empty">No encontramos prendas con esos filtros.<br><button class="linkish" id="clear">Quitar filtros</button></div>`;
+}
+function renderCount(){
+  const n = state.bag.length, el = $("#bagCount");
+  el.textContent = n; el.hidden = n===0;
+}
+
+/* ===== Paneles ===== */
+let openSheet = null, current = null;
+function show(sheet){
+  openSheet && hide(true);
+  openSheet = sheet; sheet.classList.add("on"); sheet.setAttribute("aria-hidden","false");
+  $("#scrim").classList.add("on"); document.body.style.overflow="hidden";
+  setTimeout(()=>sheet.querySelector("[data-close]").focus(), 60);
+}
+function hide(keepScrim){
+  if(!openSheet) return;
+  openSheet.classList.remove("on"); openSheet.setAttribute("aria-hidden","true"); openSheet=null;
+  if(!keepScrim){ $("#scrim").classList.remove("on"); document.body.style.overflow=""; }
+}
+function openDetail(id){
+  const p = PRODUCTS.find(x=>x.id===id); current = p;
+  $("#dBody").innerHTML = `
+    <div class="d-ph">${garment(p)}<div class="badges"><span class="badge">Pieza única</span></div></div>
+    <div><span class="tier-tag ${p.tier}">${TIERS[p.tier].label}</span>
+      <div class="d-title" id="dTitle">${p.name}</div></div>
+    <div class="d-price">${money(p.price)} <small style="font-size:13px;font-weight:600;color:var(--muted)">MXN</small></div>
+    <dl class="specs">
+      <dt>Marca</dt><dd>${p.brand}</dd>
+      <dt>Talla</dt><dd>${p.size}</dd>
+      <dt>Estado</dt><dd>${p.cond}</dd>
+      <dt>Calidad</dt><dd>${TIERS[p.tier].label}: ${TIERS[p.tier].desc}</dd>
+    </dl>
+    <p class="note">Prenda revisada, lavada, desinfectada y planchada. Si quieres medidas exactas o más fotos, pídelas al enviar tu pedido.</p>`;
+  syncAddBtn(); show($("#detail"));
+}
+function syncAddBtn(){
+  const inBag = current && state.bag.includes(current.id);
+  $("#dAdd").textContent = inBag ? "Ya está en tu bolsa · Ver bolsa" : "Agregar a mi bolsa";
+}
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("on"),1800);
+}
+
+const form = {delivery:"punto", name:"", address:""};
+function bagItems(){ return state.bag.map(id=>PRODUCTS.find(p=>p.id===id)).filter(Boolean); }
+function orderText(){
+  const items = bagItems(), sub = items.reduce((s,p)=>s+p.price,0);
+  const fee = form.delivery==="domicilio" ? STORE.homeFee : 0;
+  const lines = items.map(p=>`• ${p.name} (${p.brand}, talla ${p.size}) — ${money(p.price)}`);
+  return [
+    `Hola ${STORE.name}, quiero hacer este pedido:`, "", ...lines, "",
+    `Subtotal: ${money(sub)}`,
+    `Entrega: ${form.delivery==="domicilio" ? `A domicilio (${money(fee)})` : "Punto de entrega en el Centro (gratis)"}`,
+    `Total: ${money(sub+fee)} MXN`, "",
+    `Nombre: ${form.name}`,
+    form.delivery==="domicilio" ? `Dirección: ${form.address}` : null
+  ].filter(l=>l!==null).join("\n");
+}
+function renderBag(){
+  const items = bagItems();
+  if(!items.length){
+    $("#bagBody").innerHTML = `<div class="empty-bag"><span>Tu bolsa está vacía.</span><button class="btn btn-dark" style="width:auto" data-close>Ver prendas</button></div>`;
+    $("#bagFoot").innerHTML = ""; $("#bagFoot").hidden = true; return;
+  }
+  $("#bagFoot").hidden = false;
+  const sub = items.reduce((s,p)=>s+p.price,0), fee = form.delivery==="domicilio"?STORE.homeFee:0;
+  $("#bagBody").innerHTML = `
+    ${items.map(p=>`<div class="line"><div class="mini">${garment(p)}</div>
+      <div><b>${p.name}</b><span>${TIERS[p.tier].label} · Talla ${p.size}</span></div>
+      <div style="text-align:right"><div class="price" style="font-size:15px">${money(p.price)}</div><button class="rm" data-rm="${p.id}">Quitar</button></div></div>`).join("")}
+    <fieldset>
+      <legend>¿Cómo quieres recibirlo?</legend>
+      <label class="opt"><input type="radio" name="dl" id="dlPunto" value="punto" ${form.delivery==="punto"?"checked":""}>
+        <span>Punto de entrega en el Centro<small>Acordamos lugar y hora</small></span><span class="fee">Gratis</span></label>
+      <label class="opt"><input type="radio" name="dl" id="dlCasa" value="domicilio" ${form.delivery==="domicilio"?"checked":""}>
+        <span>A domicilio en San Cristóbal<small>Dentro de la ciudad</small></span><span class="fee">${money(STORE.homeFee)}</span></label>
+    </fieldset>
+    <label class="field">Tu nombre<input id="fName" value="${form.name.replace(/"/g,"&quot;")}" autocomplete="name" placeholder="Ej. María López"></label>
+    <label class="field" ${form.delivery==="domicilio"?"":"hidden"}>Dirección y colonia<textarea id="fAddr" rows="2" placeholder="Calle, número y colonia">${form.address}</textarea></label>
+    <p class="note">¿Estás fuera de San Cristóbal? Envía tu pedido de todos modos y te decimos si podemos mandarlo.</p>`;
+  $("#bagFoot").innerHTML = `
+    <div class="totals">
+      <div><span>Subtotal (${items.length} ${items.length===1?"prenda":"prendas"})</span><span>${money(sub)}</span></div>
+      <div><span>Entrega</span><span>${fee?money(fee):"Gratis"}</span></div>
+      <div class="grand"><span>Total</span><span>${money(sub+fee)} MXN</span></div>
+    </div>
+    <span class="err" id="bagErr" hidden></span>
+    <a class="btn btn-wa" id="sendWa" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/></svg>Enviar pedido por WhatsApp</a>
+    <div class="copy-row">¿No se abre WhatsApp? <button class="linkish" id="copyOrder">Copiar pedido</button> y mándalo a <span class="phone">${STORE.whatsappLabel}</span></div>`;
+  updateWaHref();
+}
+function updateWaHref(){ const a=$("#sendWa"); if(a) a.href = waLink(orderText()); }
+function validOrder(){
+  const err = $("#bagErr");
+  let msg = "";
+  if(!form.name.trim()) msg = "Escribe tu nombre para enviar el pedido.";
+  else if(form.delivery==="domicilio" && !form.address.trim()) msg = "Escribe tu dirección para la entrega a domicilio.";
+  err.textContent = msg; err.hidden = !msg; return !msg;
+}
+
+/* ===== Eventos ===== */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, a"); if(!t) return;
+  if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); }
+  else if (t.dataset.t){ state.type=t.dataset.t; renderRails(); renderGrid(); }
+  else if (t.dataset.tier){ state.tier = state.tier===t.dataset.tier ? null : t.dataset.tier; renderRails(); renderGrid();
+    document.getElementById("catalogo").scrollIntoView(); }
+  else if (t.id==="clear"){ Object.assign(state,{gender:"todo",tier:null,type:"todo",q:""}); $("#q").value=""; renderRails(); renderGrid(); }
+  else if (t.classList.contains("card")) openDetail(+t.dataset.id);
+  else if (t.id==="dAdd"){
+    if(state.bag.includes(current.id)){ renderBag(); show($("#bag")); return; }
+    state.bag.push(current.id); saveBag(); renderCount(); renderGrid(); syncAddBtn(); toast("Agregada a tu bolsa");
+  }
+  else if (t.id==="openBag"){ renderBag(); show($("#bag")); }
+  else if (t.hasAttribute("data-close")){ hide(); }
+  else if (t.dataset.rm){ state.bag = state.bag.filter(id=>id!==+t.dataset.rm); saveBag(); renderCount(); renderGrid(); renderBag(); }
+  else if (t.id==="sendWa"){ if(!validOrder()) e.preventDefault(); }
+  else if (t.id==="copyOrder"){
+    if(!validOrder()) return;
+    const text = orderText();
+    const done = () => toast("Pedido copiado");
+    try { navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text)); } catch(err){ fallbackCopy(text); }
+  }
+});
+function fallbackCopy(text){
+  const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast("Pedido copiado");}catch(e){} ta.remove();
+}
+document.addEventListener("input", e => {
+  if (e.target.id==="q"){ state.q=e.target.value; renderGrid(); }
+  if (e.target.id==="fName"){ form.name=e.target.value; updateWaHref(); }
+  if (e.target.id==="fAddr"){ form.address=e.target.value; updateWaHref(); }
+});
+document.addEventListener("change", e => {
+  if (e.target.id==="sort"){ state.sort=e.target.value; renderGrid(); }
+  if (e.target.name==="dl"){ form.delivery=e.target.value; renderBag(); }
+});
+$("#scrim").addEventListener("click", ()=>hide());
+document.addEventListener("keydown", e => { if(e.key==="Escape") hide(); });
+
+$("#phoneTxt").textContent = STORE.whatsappLabel;
+$("#fab").href = waLink(`Hola ${STORE.name}, tengo una pregunta.`);
+renderRails(); renderGrid(); renderCount();
+</script>
+</body>
+</html>
