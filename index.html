@@ -145,10 +145,18 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));list-style:none;padding:0;margin:0;counter-reset:s}
 .steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:34px 1fr;gap:4px 12px}
 .steps li::before{content:counter(s);grid-row:span 2;width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center}
-.steps.process{grid-template-columns:repeat(2,minmax(0,1fr))}
-.steps.process li{grid-template-columns:1fr;padding:14px}
-.steps.process li::before{grid-row:auto;width:30px;height:30px;font-size:14px;margin-bottom:6px}
-@media (min-width:860px){.steps.process{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.proc-link{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink);text-decoration:none}
+.proc-link b{display:block;font-size:14px}
+.proc-link small{font-size:12.5px;color:var(--accent);font-weight:700}
+.proc-link svg,.back svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.page .wrap{padding-block:16px 10px;display:grid;gap:14px;max-width:760px}
+.back{display:inline-flex;align-items:center;gap:4px;justify-self:start;color:var(--ink);font-weight:600;font-size:14px;text-decoration:none;padding:6px 0}
+.page-eyebrow{color:var(--accent);opacity:1}
+.page-title{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:clamp(26px,6.5vw,38px);line-height:1.05}
+.page-lead{margin:0;color:var(--muted);font-size:15.5px;max-width:60ch}
+.page .steps{grid-template-columns:1fr}
+.page-cta{justify-self:start;width:auto}
+.foot-link{color:var(--ink);font-weight:600;justify-self:start}
 .steps b{font-size:15px}.steps span{font-size:13.5px;color:var(--muted)}
 .delivery{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 .dcard{border-radius:var(--r);padding:16px;background:var(--surface);border:1px solid var(--line);display:grid;gap:4px}
@@ -253,16 +261,10 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
   <section class="section wrap" aria-labelledby="tiersH">
     <div class="sec-head"><h2 id="tiersH">Elige tu calidad</h2><span>Toca para filtrar</span></div>
     <div class="tiers" id="tiers"></div>
-  </section>
-
-  <section class="section wrap" id="proceso" aria-labelledby="procH">
-    <div class="sec-head"><h2 id="procH">Así preparamos cada prenda</h2></div>
-    <ol class="steps process">
-      <li><b>Se revisa</b><span>Costuras, cierres, botones y manchas, pieza por pieza.</span></li>
-      <li><b>Se lava</b><span>Lavado completo antes de salir a la venta.</span></li>
-      <li><b>Se desinfecta</b><span>Para que la estrenes con toda confianza.</span></li>
-      <li><b>Se plancha</b><span>Y se dobla lista para usar.</span></li>
-    </ol>
+    <a class="proc-link" href="#proceso">
+      <span><b>Revisada, lavada, desinfectada y planchada</b><small>Así preparamos cada prenda</small></span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
   </section>
 
   <section class="section wrap" id="catalogo" aria-labelledby="catH">
@@ -299,10 +301,28 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
   </section>
 </main>
 
+<main id="proceso" class="page" hidden>
+  <div class="wrap">
+    <a class="back" href="#inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Volver a la tienda</a>
+    <span class="eyebrow page-eyebrow">Nuestro proceso</span>
+    <h1 class="page-title">Así preparamos cada prenda</h1>
+    <p class="page-lead">Ninguna prenda sale a la venta tal como llega en la paca. Antes de publicarla, pasa por cuatro pasos.</p>
+    <ol class="steps">
+      <li><b>Se revisa</b><span>Pieza por pieza revisamos costuras, cierres, botones y manchas. Lo que no pasa la revisión no se vende.</span></li>
+      <li><b>Se lava</b><span>Cada prenda recibe un lavado completo antes de salir a la venta.</span></li>
+      <li><b>Se desinfecta</b><span>Para que la estrenes con toda confianza.</span></li>
+      <li><b>Se plancha</b><span>La planchamos y doblamos para que llegue lista para usar.</span></li>
+    </ol>
+    <p class="page-lead">Después la clasificamos según su estado y su marca: <b>Básicas</b>, <b>De primera</b> o <b>Premium</b>.</p>
+    <a class="btn btn-dark page-cta" href="#catalogo">Ver prendas</a>
+  </div>
+</main>
+
 <footer>
   <div class="wrap">
     <span class="logo">AIDA LINE</span>
     <span>Ropa de paca seleccionada · San Cristóbal de las Casas, Chiapas</span>
+    <a class="foot-link" href="#proceso">Así preparamos cada prenda</a>
     <span>WhatsApp: <span class="phone" id="phoneTxt"></span></span>
   </div>
 </footer>
@@ -551,7 +571,7 @@ function validOrder(){
 /* ===== Eventos ===== */
 document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if(!t) return;
-  if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); }
+  if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); toShop(); }
   else if (t.dataset.t){ state.type=t.dataset.t; renderRails(); renderGrid(); }
   else if (t.dataset.tier){ state.tier = state.tier===t.dataset.tier ? null : t.dataset.tier; renderRails(); renderGrid();
     document.getElementById("catalogo").scrollIntoView(); }
@@ -577,7 +597,7 @@ function fallbackCopy(text){
   document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast("Pedido copiado");}catch(e){} ta.remove();
 }
 document.addEventListener("input", e => {
-  if (e.target.id==="q"){ state.q=e.target.value; renderGrid(); }
+  if (e.target.id==="q"){ state.q=e.target.value; renderGrid(); toShop(); }
   if (e.target.id==="fName"){ form.name=e.target.value; updateWaHref(); }
   if (e.target.id==="fAddr"){ form.address=e.target.value; updateWaHref(); }
 });
@@ -588,9 +608,22 @@ document.addEventListener("change", e => {
 $("#scrim").addEventListener("click", ()=>hide());
 document.addEventListener("keydown", e => { if(e.key==="Escape") hide(); });
 
+/* ===== Páginas: tienda (#inicio) y proceso (#proceso) ===== */
+function route(){
+  const onProc = location.hash === "#proceso";
+  $("#inicio").hidden = onProc;
+  $("#proceso").hidden = !onProc;
+  hide();
+  if (onProc) { window.scrollTo(0,0); return; }
+  const el = location.hash && location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+  if (el && el.id !== "inicio") el.scrollIntoView(); else window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+function toShop(){ if (!$("#proceso").hidden) location.hash = "#catalogo"; }
+
 $("#phoneTxt").textContent = STORE.whatsappLabel;
 $("#fab").href = waLink(`Hola ${STORE.name}, tengo una pregunta.`);
-renderRails(); renderGrid(); renderCount();
+renderRails(); renderGrid(); renderCount(); route();
 </script>
 </body>
 </html>
