@@ -102,21 +102,12 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .sec-head h2{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:20px;letter-spacing:.01em}
 .sec-head span{color:var(--muted);font-size:13px}
-.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.tier{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px 12px;text-align:left;display:grid;gap:4px;align-content:start}
-.tier[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.tier b{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:14px;letter-spacing:.02em}
-.tier .from{font-size:12.5px;color:var(--muted)}
-.tier .from strong{color:var(--ink);font-variant-numeric:tabular-nums}
-.tier small{font-size:12px;color:var(--muted);line-height:1.35}
-.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-bottom:4px}
-@media (max-width:520px){
-  .tiers{grid-template-columns:1fr}
-  .tier{grid-template-columns:auto 1fr auto;align-items:center;gap:2px 10px;padding:12px 14px}
-  .tier .dot{grid-row:span 2;margin:0}
-  .tier small{grid-column:2/4}
-  .tier .from{grid-row:1;grid-column:3;justify-self:end}
-}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;margin-bottom:8px;background:var(--tile);border-radius:12px}
+.seg-btn{border:0;background:transparent;border-radius:9px;padding:9px 4px;font-weight:700;font-size:13px;color:var(--muted);white-space:nowrap}
+.seg-btn[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(27,24,32,.14)}
+.seg-desc{margin:0 0 12px;min-height:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.seg-desc strong{color:var(--ink);font-variant-numeric:tabular-nums}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
 
 /* Catálogo */
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
@@ -125,7 +116,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}
 @media (min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:1000px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.card{display:grid;gap:6px;min-width:0;text-align:left;border:0;background:transparent;padding:0}
+.card{display:grid;gap:6px;align-content:start;min-width:0;text-align:left;border:0;background:transparent;padding:0}
 .ph{position:relative;aspect-ratio:3/4;max-width:100%;border-radius:12px;background:var(--tile);overflow:hidden;display:grid;place-items:center}
 .ph svg.g{width:74%;height:auto;transition:transform .35s ease}
 .card:hover .ph svg.g{transform:scale(1.04)}
@@ -272,9 +263,7 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
     </div>
   </section>
 
-  <section class="section wrap" aria-labelledby="tiersH">
-    <div class="sec-head"><h2 id="tiersH">Elige tu calidad</h2><span>Toca para filtrar</span></div>
-    <div class="tiers" id="tiers"></div>
+  <section class="section wrap">
     <a class="proc-link" href="#proceso">
       <span><b>Revisada, lavada, desinfectada y planchada</b><small>Así preparamos cada prenda</small></span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
@@ -283,6 +272,8 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
 
   <section class="section wrap" id="catalogo" aria-labelledby="catH">
     <div class="sec-head"><h2 id="catH">Recién llegadas</h2></div>
+    <div class="seg" id="tiers" role="group" aria-label="Calidad"></div>
+    <p class="seg-desc" id="tierDesc"></p>
     <div class="rail" id="typeRail" role="group" aria-label="Tipo de prenda"></div>
     <div class="toolbar">
       <span class="results" id="results"></span>
@@ -455,14 +446,14 @@ function renderRails(){
     `<button class="chip" data-g="${k}" aria-pressed="${state.gender===k}">${l}</button>`).join("");
   $("#typeRail").innerHTML = Object.entries(TYPES).map(([k,l]) =>
     `<button class="chip" data-t="${k}" aria-pressed="${state.type===k}">${l}</button>`).join("");
-  $("#tiers").innerHTML = Object.entries(TIERS).map(([k,t]) => {
-    const min = Math.min(...PRODUCTS.filter(p=>p.tier===k).map(p=>p.price));
-    return `<button class="tier" data-tier="${k}" aria-pressed="${state.tier===k}">
-      <span class="dot" style="background:${t.color}"></span>
-      <b>${t.label}</b>
-      <span class="from">desde <strong>${money(min)}</strong></span>
-      <small>${t.desc}</small></button>`;
-  }).join("");
+  const cur = state.tier || "all";
+  $("#tiers").innerHTML = [["all","Todas"], ...Object.entries(TIERS).map(([k,t])=>[k,t.label])]
+    .map(([k,l]) => `<button class="seg-btn" data-tier="${k}" aria-pressed="${cur===k}">${l}</button>`).join("");
+  const t = state.tier && TIERS[state.tier];
+  const min = t ? Math.min(...PRODUCTS.filter(p=>p.tier===state.tier).map(p=>p.price)) : 0;
+  $("#tierDesc").innerHTML = t
+    ? `<span class="dot" style="background:${t.color}"></span><span>${t.desc} Desde <strong>${money(min)}</strong>.</span>`
+    : `<span>Básicas, de primera y premium: elige la calidad que buscas.</span>`;
 }
 function filtered(){
   const q = state.q.trim().toLowerCase();
@@ -611,8 +602,7 @@ document.addEventListener("click", e => {
   if (t.dataset.slide){ const tr=$("#galTrack"); tr.scrollTo({left:+t.dataset.slide*tr.clientWidth, behavior:"smooth"}); }
   else if (t.dataset.g){ state.gender=t.dataset.g; renderRails(); renderGrid(); toShop(); }
   else if (t.dataset.t){ state.type=t.dataset.t; renderRails(); renderGrid(); }
-  else if (t.dataset.tier){ state.tier = state.tier===t.dataset.tier ? null : t.dataset.tier; renderRails(); renderGrid();
-    document.getElementById("catalogo").scrollIntoView(); }
+  else if (t.dataset.tier){ state.tier = t.dataset.tier==="all" ? null : t.dataset.tier; renderRails(); renderGrid(); }
   else if (t.id==="clear"){ Object.assign(state,{gender:"todo",tier:null,type:"todo",q:""}); $("#q").value=""; renderRails(); renderGrid(); }
   else if (t.classList.contains("card")) openDetail(+t.dataset.id);
   else if (t.id==="dAdd"){
