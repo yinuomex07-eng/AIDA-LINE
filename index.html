@@ -198,6 +198,17 @@ footer .logo{justify-self:start;font-size:15px}
 .sheet-head h2{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:17px}
 .sheet-body{overflow-y:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px;align-content:start}
 .sheet-foot{padding:12px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);display:grid;gap:10px}
+.sheet.drawer{left:0;right:auto;top:0;bottom:0;width:min(86vw,340px);max-height:none;border-radius:0 20px 20px 0;transform:translateX(-105%);padding-top:env(safe-area-inset-top,0px)}
+.sheet.drawer.on{transform:none}
+.menu-logo{letter-spacing:.32em;font-size:15px}
+.menu{gap:20px}
+.m-group{display:grid}
+.m-label{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-bottom:4px}
+.m-item{display:flex;align-items:center;gap:10px;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:12px 2px;text-align:left;font-size:15px;font-weight:600;color:var(--ink);text-decoration:none}
+.m-item>span:first-child{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.m-count{font-size:12.5px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.m-item svg{width:16px;height:16px;flex:none;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.m-contact{font-size:13.5px;color:var(--muted)}
 .d-ph{aspect-ratio:3/4;width:min(100%,340px);max-width:100%;margin-inline:auto;border-radius:14px;background:var(--tile);display:grid;place-items:center;position:relative;overflow:hidden}
 .d-ph svg.g{width:72%;height:auto}
 .d-title{font-size:19px;font-weight:700;line-height:1.25}
@@ -240,9 +251,9 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
 <header class="top">
   <div class="wrap">
     <div class="bar">
-      <a class="icon-btn" href="#como-comprar" aria-label="Cómo comprar">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.6-.8 1.1v.5M12 17h.01"/></svg>
-      </a>
+      <button class="icon-btn" id="openMenu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
       <a class="logo" href="#inicio">AIDA LINE</a>
       <button class="icon-btn" id="openBag" aria-label="Abrir bolsa">
         <svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
@@ -349,6 +360,11 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
 </a>
 
 <div class="scrim" id="scrim"></div>
+
+<aside class="sheet drawer" id="menu" role="dialog" aria-modal="true" aria-labelledby="menuH" aria-hidden="true">
+  <div class="sheet-head"><h2 id="menuH" class="menu-logo">AIDA LINE</h2><button class="icon-btn" data-close aria-label="Cerrar menú"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <nav class="sheet-body menu" id="menuBody" aria-label="Categorías"></nav>
+</aside>
 
 <aside class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true">
   <div class="sheet-head"><h2>Detalle</h2><button class="icon-btn" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -550,6 +566,25 @@ function syncThumbs(){
   const i = Math.round(tr.scrollLeft / tr.clientWidth);
   document.querySelectorAll(".gal-th").forEach((b,k)=>b.setAttribute("aria-current", String(k===i)));
 }
+function renderMenu(){
+  const chev = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  const n = f => PRODUCTS.filter(f).length;
+  const item = (attr, label, extra) => `<button class="m-item" ${attr}><span>${label}</span>${extra}${chev}</button>`;
+  const cnt = k => `<span class="m-count">${k}</span>`;
+  $("#menuBody").innerHTML = `
+    <div class="m-group"><span class="m-label">Departamentos</span>
+      ${GENDERS.map(([k,l]) => item(`data-g="${k}"`, k==="todo" ? "Ver todo" : l,
+        k==="accesorios" && !hasAcc() ? '<span class="soon-tag">Pronto</span>' : cnt(k==="todo" ? PRODUCTS.length : n(p=>p.gender===k)))).join("")}</div>
+    <div class="m-group"><span class="m-label">Calidad</span>
+      ${Object.entries(TIERS).map(([k,t]) => item(`data-tier="${k}"`, `<span class="dot" style="background:${t.color}"></span>${t.label}`, cnt(n(p=>p.tier===k)))).join("")}</div>
+    <div class="m-group"><span class="m-label">Tipo de prenda</span>
+      ${Object.entries(TYPES).filter(([k]) => k!=="todo" && !ACC_TYPES.includes(k)).map(([k,l]) => item(`data-t="${k}"`, l, cnt(n(p=>p.type===k)))).join("")}</div>
+    <div class="m-group"><span class="m-label">Información</span>
+      <a class="m-item" href="#proceso"><span>Así preparamos cada prenda</span>${chev}</a>
+      <a class="m-item" href="#como-comprar"><span>Cómo comprar</span>${chev}</a>
+      <a class="m-item" href="#entregas"><span>Entregas</span>${chev}</a></div>
+    <div class="m-contact">WhatsApp: <span class="phone">${STORE.whatsappLabel}</span></div>`;
+}
 function syncAddBtn(){
   const inBag = current && state.bag.includes(current.id);
   $("#dAdd").textContent = inBag ? "Ya está en tu bolsa · Ver bolsa" : "Agregar a mi bolsa";
@@ -620,13 +655,19 @@ function validOrder(){
 /* ===== Eventos ===== */
 document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if(!t) return;
+  if (t.id==="openMenu"){ renderMenu(); show($("#menu")); return; }
+  const inMenu = !!t.closest("#menu") && !t.hasAttribute("data-close");
+  if (inMenu && t.tagName==="A"){ hide(); return; }
+  if (inMenu && (t.dataset.g || t.dataset.t || t.dataset.tier)){ Object.assign(state,{gender:"todo",tier:null,type:"todo",q:""}); $("#q").value=""; }
   if (t.dataset.slide){ const tr=$("#galTrack"); tr.scrollTo({left:+t.dataset.slide*tr.clientWidth, behavior:"smooth"}); }
   else if (t.dataset.g){ const was = state.gender==="accesorios";
     state.gender=t.dataset.g; if ((state.gender==="accesorios")!==was) state.type="todo";
     renderRails(); renderGrid(); toShop();
     const rail=$("#genderRail"), on=rail.querySelector('[aria-pressed="true"]'); rail.scrollTo({left:Math.max(0,on.offsetLeft-rail.offsetLeft-16), behavior:"smooth"});
     if (t.dataset.scroll) document.getElementById("catalogo").scrollIntoView(); }
-  else if (t.dataset.t){ state.type=t.dataset.t; renderRails(); renderGrid(); }
+  else if (t.dataset.t){ state.type=t.dataset.t;
+    if (t.dataset.t!=="todo" && ACC_TYPES.includes(t.dataset.t)!==(state.gender==="accesorios")) state.gender = ACC_TYPES.includes(t.dataset.t) ? "accesorios" : "todo";
+    renderRails(); renderGrid(); }
   else if (t.dataset.tier){ state.tier = t.dataset.tier==="all" ? null : t.dataset.tier; renderRails(); renderGrid(); }
   else if (t.id==="clear"){ Object.assign(state,{gender:"todo",tier:null,type:"todo",q:""}); $("#q").value=""; renderRails(); renderGrid(); }
   else if (t.classList.contains("card")) openDetail(+t.dataset.id);
@@ -643,6 +684,10 @@ document.addEventListener("click", e => {
     const text = orderText();
     const done = () => toast("Pedido copiado");
     try { navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text)); } catch(err){ fallbackCopy(text); }
+  }
+  if (inMenu && (t.dataset.g || t.dataset.t || t.dataset.tier)){
+    hide();
+    if ($("#proceso").hidden) document.getElementById("catalogo").scrollIntoView(); else location.hash = "#catalogo";
   }
 });
 function fallbackCopy(text){
