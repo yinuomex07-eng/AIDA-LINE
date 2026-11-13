@@ -323,7 +323,7 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
       <li><b>Confirmamos y entregamos</b><span>Te avisamos si la pieza sigue disponible y acordamos entrega y pago.</span></li>
     </ol>
     <div class="dcard ap-card" id="apartados"><span class="k">Apartados</span><b>Aparta con 50% y liquida en 7 días</b>
-      <p>Elige "Apartar" en la prenda o en tu bolsa, envía tu anticipo y la guardamos una semana para ti. Si no liquidas a tiempo, la prenda vuelve a la venta y tu anticipo queda como saldo a favor para otra prenda durante 30 días.</p></div>
+      <p>Elige "Apartar" en la prenda o en tu bolsa, envía tu anticipo y la guardamos una semana para ti. Si no liquidas en 7 días, la prenda vuelve a la venta y el anticipo no se devuelve.</p></div>
   </section>
 
   <section class="section wrap" id="entregas" aria-labelledby="delH">
@@ -397,7 +397,7 @@ const STORE = {
   apartado: {
     porcentaje: 50,   // anticipo para apartar
     dias: 7,          // días para liquidar
-    politica: "Si no liquidas a tiempo, la prenda vuelve a la venta. Tu anticipo no se devuelve en efectivo: queda como saldo a favor para otra prenda durante 30 días."
+    politica: "Si no liquidas a tiempo, la prenda vuelve a la venta y el anticipo no se devuelve."
   }
 };
 const anticipo = n => Math.ceil(n * STORE.apartado.porcentaje / 100);
@@ -623,7 +623,8 @@ function orderText(){
     `Entrega: ${form.delivery==="domicilio" ? `A domicilio (${money(fee)})` : "Punto de entrega en el Centro (gratis)"}`,
     `Total: ${money(sub+fee)} MXN`,
     ap ? `Anticipo para apartar (${A.porcentaje}%): ${money(dep)}` : null,
-    ap ? `Resto: ${money(sub+fee-dep)}, a liquidar en ${A.dias} días desde que confirmen mi anticipo` : null, "",
+    ap ? `Resto: ${money(sub+fee-dep)}, a liquidar en ${A.dias} días desde que confirmen mi anticipo` : null,
+    ap ? `Entiendo que si no liquido en ${A.dias} días, la prenda vuelve a la venta y el anticipo no se devuelve.` : null, "",
     `Nombre: ${form.name}`,
     form.delivery==="domicilio" ? `Dirección: ${form.address}` : null
   ].filter(l=>l!==null).join("\n");
