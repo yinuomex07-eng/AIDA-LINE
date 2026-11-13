@@ -94,6 +94,11 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .btn-light{background:var(--surface);color:var(--ink)}
 .btn-ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
 .btn-dark{background:var(--ink);color:var(--bg);width:100%}
+.btn-outline{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);width:100%}
+.ap-hint{margin:0;font-size:13.5px;color:var(--muted)}
+.ap-hint strong{color:var(--ink)}
+.ap-card{margin-top:10px}
+.totals .dep{font-weight:800;color:var(--accent)}
 .btn-wa{background:var(--wa);color:#fff;width:100%}
 .btn svg{width:18px;height:18px;fill:currentColor}
 
@@ -154,7 +159,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .proc-link b{display:block;font-size:14px}
 .acc-link{width:100%;text-align:left;border:1px dashed var(--line);background:var(--surface)}
 .proc-link.acc-link small{color:var(--muted)}
-#catalogo,#entregas,#como-comprar{scroll-margin-top:calc(170px + env(safe-area-inset-top,0px))}
+#catalogo,#entregas,#como-comprar,#apartados{scroll-margin-top:calc(170px + env(safe-area-inset-top,0px))}
 .soon-tag{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:var(--accent-soft);color:var(--accent);margin-left:2px}
 .chip[aria-pressed="true"] .soon-tag{background:var(--accent);color:var(--accent-ink)}
 .soon-box{display:grid;gap:8px;justify-items:center;color:var(--muted)}
@@ -317,6 +322,8 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
       <li><b>Envía tu pedido por WhatsApp</b><span>Tu bolsa se convierte en un mensaje listo para mandar.</span></li>
       <li><b>Confirmamos y entregamos</b><span>Te avisamos si la pieza sigue disponible y acordamos entrega y pago.</span></li>
     </ol>
+    <div class="dcard ap-card" id="apartados"><span class="k">Apartados</span><b>Aparta con 50% y liquida en 7 días</b>
+      <p>Elige "Apartar" en la prenda o en tu bolsa, envía tu anticipo y la guardamos una semana para ti. Si no liquidas a tiempo, la prenda vuelve a la venta y tu anticipo queda como saldo a favor para otra prenda durante 30 días.</p></div>
   </section>
 
   <section class="section wrap" id="entregas" aria-labelledby="delH">
@@ -369,7 +376,7 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
 <aside class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true">
   <div class="sheet-head"><h2>Detalle</h2><button class="icon-btn" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
   <div class="sheet-body" id="dBody"></div>
-  <div class="sheet-foot"><button class="btn btn-dark" id="dAdd">Agregar a mi bolsa</button></div>
+  <div class="sheet-foot"><button class="btn btn-dark" id="dAdd">Agregar a mi bolsa</button><button class="btn btn-outline" id="dApartar">Apartar con 50%</button></div>
 </aside>
 
 <aside class="sheet" id="bag" role="dialog" aria-modal="true" aria-labelledby="bagH" aria-hidden="true">
@@ -386,8 +393,14 @@ const STORE = {
   name: "AIDA LINE",
   whatsapp: "529671234567",          // NÚMERO DE EJEMPLO: cambia por el real (52 + 10 dígitos, sin espacios)
   whatsappLabel: "+52 967 123 4567 (ejemplo)",
-  homeFee: 35
+  homeFee: 35,
+  apartado: {
+    porcentaje: 50,   // anticipo para apartar
+    dias: 7,          // días para liquidar
+    politica: "Si no liquidas a tiempo, la prenda vuelve a la venta. Tu anticipo no se devuelve en efectivo: queda como saldo a favor para otra prenda durante 30 días."
+  }
 };
+const anticipo = n => Math.ceil(n * STORE.apartado.porcentaje / 100);
 const TIERS = {
   basica:  { label: "Básicas",    color: "var(--t-basica)",  desc: "Buen estado, uso diario. Precio bajo." },
   primera: { label: "De primera", color: "var(--t-primera)", desc: "Como nuevas, sin detalles visibles." },
@@ -549,6 +562,7 @@ function openDetail(id){
       <dt>Estado</dt><dd>${p.cond}</dd>
       <dt>Calidad</dt><dd>${TIERS[p.tier].label}: ${TIERS[p.tier].desc}</dd>
     </dl>
+    <p class="ap-hint">¿No puedes pagarla toda hoy? Apártala con <strong>${money(anticipo(p.price))}</strong> (${STORE.apartado.porcentaje}%) y liquídala en ${STORE.apartado.dias} días.</p>
     <p class="note">Prenda revisada, lavada, desinfectada y planchada. Si quieres medidas exactas o más fotos, pídelas al enviar tu pedido.</p>`;
   syncAddBtn(); show($("#detail"));
   const tr = $("#galTrack"); if (tr) tr.addEventListener("scroll", ()=>{ clearTimeout(tr._t); tr._t=setTimeout(syncThumbs,60); });
@@ -582,29 +596,34 @@ function renderMenu(){
     <div class="m-group"><span class="m-label">Información</span>
       <a class="m-item" href="#proceso"><span>Así preparamos cada prenda</span>${chev}</a>
       <a class="m-item" href="#como-comprar"><span>Cómo comprar</span>${chev}</a>
+      <a class="m-item" href="#apartados"><span>Apartados</span>${chev}</a>
       <a class="m-item" href="#entregas"><span>Entregas</span>${chev}</a></div>
     <div class="m-contact">WhatsApp: <span class="phone">${STORE.whatsappLabel}</span></div>`;
 }
 function syncAddBtn(){
   const inBag = current && state.bag.includes(current.id);
   $("#dAdd").textContent = inBag ? "Ya está en tu bolsa · Ver bolsa" : "Agregar a mi bolsa";
+  if (current) $("#dApartar").textContent = `Apartar con ${STORE.apartado.porcentaje}% · ${money(anticipo(current.price))}`;
 }
 function toast(msg){
   const t=$("#toast"); t.textContent=msg; t.classList.add("on");
   clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("on"),1800);
 }
 
-const form = {delivery:"punto", name:"", address:""};
+const form = {delivery:"punto", pay:"completo", name:"", address:""};
 function bagItems(){ return state.bag.map(id=>PRODUCTS.find(p=>p.id===id)).filter(Boolean); }
 function orderText(){
   const items = bagItems(), sub = items.reduce((s,p)=>s+p.price,0);
   const fee = form.delivery==="domicilio" ? STORE.homeFee : 0;
   const lines = items.map(p=>`• ${p.name} (${p.brand}, talla ${p.size}) — ${money(p.price)}`);
+  const ap = form.pay==="apartar", A = STORE.apartado, dep = anticipo(sub);
   return [
-    `Hola ${STORE.name}, quiero hacer este pedido:`, "", ...lines, "",
+    ap ? `Hola ${STORE.name}, quiero APARTAR estas prendas:` : `Hola ${STORE.name}, quiero hacer este pedido:`, "", ...lines, "",
     `Subtotal: ${money(sub)}`,
     `Entrega: ${form.delivery==="domicilio" ? `A domicilio (${money(fee)})` : "Punto de entrega en el Centro (gratis)"}`,
-    `Total: ${money(sub+fee)} MXN`, "",
+    `Total: ${money(sub+fee)} MXN`,
+    ap ? `Anticipo para apartar (${A.porcentaje}%): ${money(dep)}` : null,
+    ap ? `Resto: ${money(sub+fee-dep)}, a liquidar en ${A.dias} días desde que confirmen mi anticipo` : null, "",
     `Nombre: ${form.name}`,
     form.delivery==="domicilio" ? `Dirección: ${form.address}` : null
   ].filter(l=>l!==null).join("\n");
@@ -628,6 +647,14 @@ function renderBag(){
       <label class="opt"><input type="radio" name="dl" id="dlCasa" value="domicilio" ${form.delivery==="domicilio"?"checked":""}>
         <span>A domicilio en San Cristóbal<small>Dentro de la ciudad</small></span><span class="fee">${money(STORE.homeFee)}</span></label>
     </fieldset>
+    <fieldset>
+      <legend>¿Cómo quieres pagar?</legend>
+      <label class="opt"><input type="radio" name="pay" id="payFull" value="completo" ${form.pay==="completo"?"checked":""}>
+        <span>Pago completo<small>Pagas al recibir tu pedido</small></span><span class="fee">${money(sub+fee)}</span></label>
+      <label class="opt"><input type="radio" name="pay" id="payAp" value="apartar" ${form.pay==="apartar"?"checked":""}>
+        <span>Apartar con ${STORE.apartado.porcentaje}%<small>Liquidas el resto en ${STORE.apartado.dias} días</small></span><span class="fee">${money(anticipo(sub))}</span></label>
+    </fieldset>
+    ${form.pay==="apartar" ? `<p class="note"><b>Así funciona el apartado:</b> envías tu anticipo de ${money(anticipo(sub))}, te confirmamos y la prenda queda guardada ${STORE.apartado.dias} días. ${STORE.apartado.politica}</p>` : ""}
     <label class="field">Tu nombre<input id="fName" value="${form.name.replace(/"/g,"&quot;")}" autocomplete="name" placeholder="Ej. María López"></label>
     <label class="field" ${form.delivery==="domicilio"?"":"hidden"}>Dirección y colonia<textarea id="fAddr" rows="2" placeholder="Calle, número y colonia">${form.address}</textarea></label>
     <p class="note">¿Estás fuera de San Cristóbal? Envía tu pedido de todos modos y te decimos si podemos mandarlo.</p>`;
@@ -636,10 +663,12 @@ function renderBag(){
       <div><span>Subtotal (${items.length} ${items.length===1?"prenda":"prendas"})</span><span>${money(sub)}</span></div>
       <div><span>Entrega</span><span>${fee?money(fee):"Gratis"}</span></div>
       <div class="grand"><span>Total</span><span>${money(sub+fee)} MXN</span></div>
+      ${form.pay==="apartar" ? `<div class="dep"><span>Anticipo hoy (${STORE.apartado.porcentaje}%)</span><span>${money(anticipo(sub))}</span></div>
+      <div><span>Resto en ${STORE.apartado.dias} días</span><span>${money(sub+fee-anticipo(sub))}</span></div>` : ""}
     </div>
     <span class="err" id="bagErr" hidden></span>
     <a class="btn btn-wa" id="sendWa" href="#" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/></svg>Enviar pedido por WhatsApp</a>
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/></svg>${form.pay==="apartar" ? "Apartar por WhatsApp" : "Enviar pedido por WhatsApp"}</a>
     <div class="copy-row">¿No se abre WhatsApp? <button class="linkish" id="copyOrder">Copiar pedido</button> y mándalo a <span class="phone">${STORE.whatsappLabel}</span></div>`;
   updateWaHref();
 }
@@ -671,6 +700,10 @@ document.addEventListener("click", e => {
   else if (t.dataset.tier){ state.tier = t.dataset.tier==="all" ? null : t.dataset.tier; renderRails(); renderGrid(); }
   else if (t.id==="clear"){ Object.assign(state,{gender:"todo",tier:null,type:"todo",q:""}); $("#q").value=""; renderRails(); renderGrid(); }
   else if (t.classList.contains("card")) openDetail(+t.dataset.id);
+  else if (t.id==="dApartar"){
+    if (!state.bag.includes(current.id)){ state.bag.push(current.id); saveBag(); renderCount(); renderGrid(); }
+    form.pay = "apartar"; renderBag(); show($("#bag"));
+  }
   else if (t.id==="dAdd"){
     if(state.bag.includes(current.id)){ renderBag(); show($("#bag")); return; }
     state.bag.push(current.id); saveBag(); renderCount(); renderGrid(); syncAddBtn(); toast("Agregada a tu bolsa");
@@ -702,6 +735,7 @@ document.addEventListener("input", e => {
 document.addEventListener("change", e => {
   if (e.target.id==="sort"){ state.sort=e.target.value; renderGrid(); }
   if (e.target.name==="dl"){ form.delivery=e.target.value; renderBag(); }
+  if (e.target.name==="pay"){ form.pay=e.target.value; renderBag(); }
 });
 $("#scrim").addEventListener("click", ()=>hide());
 document.addEventListener("keydown", e => { if(e.key==="Escape") hide(); });
