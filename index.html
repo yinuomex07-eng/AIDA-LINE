@@ -664,7 +664,7 @@ document.addEventListener("click", e => {
     state.gender=t.dataset.g; if ((state.gender==="accesorios")!==was) state.type="todo";
     renderRails(); renderGrid(); toShop();
     const rail=$("#genderRail"), on=rail.querySelector('[aria-pressed="true"]'); rail.scrollTo({left:Math.max(0,on.offsetLeft-rail.offsetLeft-16), behavior:"smooth"});
-    if (t.dataset.scroll) document.getElementById("catalogo").scrollIntoView(); }
+    if ($("#proceso").hidden) document.getElementById("catalogo").scrollIntoView({behavior:"smooth"}); }
   else if (t.dataset.t){ state.type=t.dataset.t;
     if (t.dataset.t!=="todo" && ACC_TYPES.includes(t.dataset.t)!==(state.gender==="accesorios")) state.gender = ACC_TYPES.includes(t.dataset.t) ? "accesorios" : "todo";
     renderRails(); renderGrid(); }
