@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AIDA Panel">
+<title>Panel AIDA LINE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Panel móvil primero: cabecera fija, vista de lista o de edición, botón principal fijo abajo. */
+:root{
+  --bg:#f6f4f7;--surface:#fff;--ink:#1b1820;--muted:#6d6774;--line:#e6e1ea;--tile:#efebf2;
+  --accent:#b8236b;--accent-ink:#fff;--accent-soft:#f8e3ee;--ok:#1f8a4c;--ok-soft:#e1f3e8;--warn:#9a6a12;--warn-soft:#f6ecd6;--bad:#b42318;--bad-soft:#fde7e5;
+  --display:"Archivo","Arial Black",system-ui,sans-serif;--body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;--r:14px;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root{--bg:#141217;--surface:#1d1a21;--ink:#f2eff4;--muted:#a59fac;--line:#2e2a33;--tile:#25212a;--accent:#ec5c9f;--accent-ink:#1a0d14;--accent-soft:#3a1f2d;--ok:#4fc982;--ok-soft:#173826;--warn:#e6b862;--warn-soft:#3a2f1a;--bad:#ff8a80;--bad-soft:#3d1a18;color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:30}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{margin:0;text-wrap:balance}
+.logo{font-family:var(--display);font-weight:800;font-stretch:112%;letter-spacing:.32em;font-size:15px;white-space:nowrap}
+.pill{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 18px;font-weight:700;font-size:15px;text-decoration:none}
+.btn-dark{background:var(--ink);color:var(--bg)}
+.btn-ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-danger{background:transparent;color:var(--bad);box-shadow:inset 0 0 0 1.5px var(--bad)}
+.btn-danger.armed{background:var(--bad);color:#fff}
+.btn:disabled{opacity:.55;cursor:wait}
+.full{width:100%}
+.err{color:var(--bad);font-size:13.5px;font-weight:600}
+
+/* Login */
+.login{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding-block:24px}
+.login-card{width:min(100%,380px);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px 22px;display:grid;gap:14px}
+.login-card .logo{font-size:18px;justify-self:center;margin-right:-.32em}
+.login-card p{margin:0;color:var(--muted);text-align:center;font-size:14px}
+label.f{display:grid;gap:5px;font-size:13px;font-weight:600}
+label.f input,label.f select,label.f textarea{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 12px;font-size:16px;font-weight:400;width:100%;min-width:0}
+label.f small{font-weight:400;color:var(--muted)}
+
+/* Cabecera */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:12px}
+.bar-l{display:flex;align-items:center;gap:10px;min-width:0}
+.bar-r{display:flex;gap:6px;align-items:center}
+.link{border:0;background:transparent;color:var(--muted);font-weight:600;font-size:14px;text-decoration:none;padding:6px 8px;border-radius:8px}
+.tabs{display:flex;gap:4px;padding-bottom:10px}
+.tab{border:0;background:transparent;padding:8px 14px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.tab .pill{margin-left:4px;font-size:9.5px;padding:2px 6px}
+
+/* Lista de prendas */
+main{padding-block:16px 110px}
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:12px}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.list{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px 8px 8px;text-align:left;width:100%}
+.row img,.row .noimg{width:56px;height:75px;object-fit:cover;border-radius:8px;background:var(--tile);display:block}
+.row b{display:block;font-size:14.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row span.sub{font-size:12.5px;color:var(--muted)}
+.row .mid{min-width:0}
+.row .r{display:grid;justify-items:end;gap:4px}
+.price{font-weight:800;font-variant-numeric:tabular-nums}
+.st{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.st.disponible{background:var(--ok-soft);color:var(--ok)}
+.st.apartada{background:var(--warn-soft);color:var(--warn)}
+.st.vendida{background:var(--tile);color:var(--muted)}
+.st.oculta{background:var(--bad-soft);color:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:36px 12px;border:1px dashed var(--line);border-radius:var(--r);display:grid;gap:10px;justify-items:center}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:15;background:linear-gradient(to top,var(--bg) 70%,transparent);padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));padding-top:18px}
+.dock .wrap{display:flex;gap:10px}
+.dock .btn{flex:1}
+
+/* Editor */
+.ed{display:grid;gap:18px}
+.ed-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ed-head h1{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:20px}
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:12px}
+.sec h2{font-size:15px;font-weight:700}
+.hint{margin:0;font-size:13px;color:var(--muted)}
+.photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ph{position:relative;aspect-ratio:3/4;max-width:100%;border-radius:10px;overflow:hidden;background:var(--tile)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .tag{position:absolute;left:6px;top:6px;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:var(--surface);color:var(--ink)}
+.ph .tag.real{top:auto;bottom:40px;background:var(--ink);color:var(--bg)}
+.ph .tools{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:4px;padding:5px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent)}
+.ph .tools button{width:30px;height:30px;border-radius:8px;border:0;background:rgba(255,255,255,.92);color:#1b1820;font-size:14px;font-weight:800;display:grid;place-items:center}
+.ph .tools button[aria-pressed="true"]{background:#1b1820;color:#fff}
+.add{border:1.5px dashed var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13px;display:grid;place-items:center;text-align:center;gap:4px;cursor:pointer;aspect-ratio:3/4;border-radius:10px;padding:6px}
+.add b{font-size:26px;line-height:1;color:var(--ink)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;background:var(--tile);border-radius:12px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:9px 2px;font-weight:700;font-size:12.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.progress{font-size:13.5px;color:var(--muted);text-align:center}
+.toast{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translate(-50%,-10px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:40;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.soon{display:grid;gap:8px;justify-items:center;text-align:center;color:var(--muted);padding:40px 12px}
+.soon b{font-family:var(--display);font-stretch:112%;font-size:19px;color:var(--ink)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Inicio de sesión -->
+<section class="login wrap" id="vLogin" hidden>
+  <form class="login-card" id="loginForm" novalidate>
+    <span class="logo">AIDA LINE</span>
+    <p>Panel de administración</p>
+    <label class="f" for="email">Correo<input id="email" type="email" autocomplete="username" inputmode="email" required></label>
+    <label class="f" for="pass">Contraseña<input id="pass" type="password" autocomplete="current-password" required></label>
+    <span class="err" id="loginErr" hidden></span>
+    <button class="btn btn-dark full" id="loginBtn" type="submit">Entrar</button>
+  </form>
+</section>
+
+<!-- Panel -->
+<div id="vApp" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="bar">
+        <div class="bar-l"><span class="logo">AIDA LINE</span><span class="pill">Panel</span></div>
+        <div class="bar-r"><a class="link" href="./" target="_blank" rel="noopener">Ver tienda</a><button class="link" id="logout">Salir</button></div>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tabProd" aria-selected="true">Prendas</button>
+        <button class="tab" role="tab" id="tabAp" aria-selected="false">Apartados <span class="pill">Pronto</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Lista -->
+    <section id="vList">
+      <div class="filters" id="filters" role="group" aria-label="Filtrar por estado"></div>
+      <div class="list" id="list"></div>
+    </section>
+
+    <!-- Editor -->
+    <section id="vEdit" class="ed" hidden>
+      <div class="ed-head"><button class="link" id="back">← Prendas</button><h1 id="edTitle">Subir prenda</h1><span style="width:70px"></span></div>
+
+      <div class="sec">
+        <h2>Fotos</h2>
+        <p class="hint">La primera foto es la que se ve en el catálogo. Toca ★ en la foto real de la prenda. Se recortan solas a 3:4.</p>
+        <div class="photos" id="photos"></div>
+        <input type="file" id="fileIn" accept="image/*" multiple hidden>
+      </div>
+
+      <div class="sec">
+        <h2>Datos de la prenda</h2>
+        <label class="f" for="fNombre">Nombre<input id="fNombre" maxlength="80" placeholder="Ej. Vestido blanco floral"></label>
+        <div class="grid2">
+          <label class="f" for="fPrecio">Precio (MXN)<input id="fPrecio" type="number" inputmode="numeric" min="0" step="1" placeholder="220"></label>
+          <label class="f" for="fTalla">Talla<input id="fTalla" maxlength="20" placeholder="M, 28, 6 años"></label>
+        </div>
+        <div class="grid2">
+          <label class="f" for="fDepto">Departamento<select id="fDepto"></select></label>
+          <label class="f" for="fTipo">Tipo<select id="fTipo"></select></label>
+        </div>
+        <div class="grid2">
+          <label class="f" for="fCalidad">Calidad<select id="fCalidad"></select></label>
+          <label class="f" for="fCond">Estado de la prenda<select id="fCond"></select></label>
+        </div>
+        <label class="f" for="fMarca">Marca<input id="fMarca" maxlength="40" placeholder="Sin marca"></label>
+        <label class="f" for="fDesc">Detalles <small>(opcional: medidas, algún detalle visible)</small><textarea id="fDesc" rows="2" maxlength="300"></textarea></label>
+      </div>
+
+      <div class="sec">
+        <h2>Estado en la tienda</h2>
+        <div class="seg" id="fEstado" role="group" aria-label="Estado en la tienda"></div>
+        <p class="hint" id="estadoHint"></p>
+      </div>
+
+      <span class="err" id="edErr" hidden></span>
+      <button class="btn btn-danger full" id="delBtn" hidden>Eliminar prenda</button>
+    </section>
+
+    <!-- Apartados -->
+    <section id="vAp" hidden>
+      <div class="soon"><span class="pill">Próximamente</span><b>Apartados</b>
+        <span>Aquí vas a registrar apartados, ver el conteo de 7 días y mandar recordatorios por WhatsApp. Mientras tanto, marca la prenda como "Apartada" desde Prendas.</span></div>
+    </section>
+  </main>
+
+  <div class="dock"><div class="wrap">
+    <button class="btn btn-dark" id="newBtn">+ Subir prenda</button>
+    <button class="btn btn-dark" id="saveBtn" hidden>Guardar prenda</button>
+  </div></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===== Conexión ===== */
+const DB = { url: "https://iahjtvxunrdzhjnpozsx.supabase.co", key: "sb_publishable_K0S-bPM9KKFZ6xkyYOZMmQ_4uWzhtNp" };
+const BUCKET = "fotos";
+
+/* ===== Catálogos (iguales a los de la tienda) ===== */
+const DEPTOS = {mujer:"Mujer", hombre:"Hombre", ninos:"Niñas y niños", accesorios:"Accesorios"};
+const TIPOS_ROPA = {chamarra:"Chamarra",sudadera:"Sudadera",sueter:"Suéter",camisa:"Camisa",playera:"Playera o blusa",vestido:"Vestido",enterizo:"Enterizo",falda:"Falda",jeans:"Jeans",short:"Short"};
+const TIPOS_ACC = {bolsa:"Bolsa",cinturon:"Cinturón",gorra:"Gorra",lentes:"Lentes",joyeria:"Joyería"};
+const CALIDADES = {basica:"Básica", primera:"De primera", premium:"Premium"};
+const CONDICIONES = ["Nuevo con etiqueta","Como nuevo","Excelente","Muy bueno","Buen estado"];
+const ESTADOS = {disponible:"Disponible", apartada:"Apartada", vendida:"Vendida", oculta:"Oculta"};
+const ESTADO_HINT = {
+  disponible:"Se ve en la tienda y se puede pedir.",
+  apartada:"Se ve en la tienda con la etiqueta \"Apartada\" y nadie más la puede pedir.",
+  vendida:"Ya no se ve en la tienda.",
+  oculta:"No se ve en la tienda. Útil para prendas que aún no quieres publicar."
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => "$" + Number(n).toLocaleString("es-MX");
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("on"),2200); }
+
+/* ===== Sesión ===== */
+const SES = "aida-admin-session";
+let session = null;
+try { session = JSON.parse(localStorage.getItem(SES) || "null"); } catch(e){}
+function saveSession(s){ session = s; try { s ? localStorage.setItem(SES, JSON.stringify(s)) : localStorage.removeItem(SES); } catch(e){} }
+async function authCall(grant, body){
+  const res = await fetch(`${DB.url}/auth/v1/token?grant_type=${grant}`, {method:"POST", headers:{apikey:DB.key,"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) throw Object.assign(new Error(data.error_description || data.msg || data.message || "Error de acceso"), {status:res.status, code:data.error_code || data.error});
+  saveSession({access_token:data.access_token, refresh_token:data.refresh_token, expires_at:Date.now()+data.expires_in*1000, email:data.user && data.user.email});
+}
+async function token(){
+  if (!session) throw new Error("Sin sesión");
+  if (Date.now() > session.expires_at - 60000) await authCall("refresh_token", {refresh_token:session.refresh_token});
+  return session.access_token;
+}
+async function api(path, {method="GET", body, headers={}, raw=false}={}){
+  const h = {apikey:DB.key, Authorization:`Bearer ${await token()}`, ...headers};
+  if (body !== undefined && !raw) h["Content-Type"] = "application/json";
+  const res = await fetch(DB.url + path, {method, headers:h, body: raw ? body : (body!==undefined ? JSON.stringify(body) : undefined)});
+  if (res.status === 401){ saveSession(null); showLogin("Tu sesión terminó. Vuelve a entrar."); throw new Error("Sesión terminada"); }
+  const text = await res.text(); let data = null; try { data = text ? JSON.parse(text) : null; } catch(e){ data = text; }
+  if (!res.ok) throw new Error((data && (data.message || data.error)) || `Error ${res.status}`);
+  return data;
+}
+
+/* ===== Vistas ===== */
+let products = [], filter = "disponible", editing = null;
+function showLogin(msg){
+  $("#vApp").hidden = true; $("#vLogin").hidden = false;
+  const e = $("#loginErr"); e.textContent = msg || ""; e.hidden = !msg;
+}
+async function enter(){
+  const ok = await api("/rest/v1/rpc/es_admin", {method:"POST", body:{}});
+  if (ok !== true){ saveSession(null); showLogin("Este correo no tiene permiso para usar el panel."); return; }
+  $("#vLogin").hidden = true; $("#vApp").hidden = false;
+  showList(); await loadProducts();
+}
+
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("#email").value.trim(), pass = $("#pass").value, btn = $("#loginBtn"), err = $("#loginErr");
+  err.hidden = true;
+  if (!email || !pass){ err.textContent = "Escribe tu correo y tu contraseña."; err.hidden = false; return; }
+  btn.disabled = true; btn.textContent = "Entrando…";
+  try { await authCall("password", {email, password:pass}); $("#pass").value = ""; await enter(); }
+  catch(ex){ err.textContent = ex.status===400 ? "Correo o contraseña incorrectos." : "No pudimos conectar. Revisa tu internet e inténtalo de nuevo."; err.hidden = false; }
+  finally { btn.disabled = false; btn.textContent = "Entrar"; }
+});
+$("#logout").addEventListener("click", async () => {
+  try { await fetch(`${DB.url}/auth/v1/logout`, {method:"POST", headers:{apikey:DB.key, Authorization:`Bearer ${session.access_token}`}}); } catch(e){}
+  saveSession(null); showLogin();
+});
+
+/* ===== Lista ===== */
+async function loadProducts(){
+  $("#list").innerHTML = `<div class="empty">Cargando prendas…</div>`;
+  try { products = await api("/rest/v1/productos?select=*&order=creado.desc"); renderList(); }
+  catch(e){ $("#list").innerHTML = `<div class="empty">No pudimos cargar las prendas.<button class="btn btn-ghost" id="reload">Intentar de nuevo</button></div>`; }
+}
+function renderList(){
+  const count = k => k==="todas" ? products.length : products.filter(p=>p.estado===k).length;
+  $("#filters").innerHTML = [...Object.entries(ESTADOS).map(([k,l])=>[k, l==="Disponible"?"Disponibles":l==="Apartada"?"Apartadas":l==="Vendida"?"Vendidas":"Ocultas"]), ["todas","Todas"]]
+    .map(([k,l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter===k}">${l} · ${count(k)}</button>`).join("");
+  const list = filter==="todas" ? products : products.filter(p=>p.estado===filter);
+  $("#list").innerHTML = list.length ? list.map(p => `
+    <button class="row" data-id="${p.id}">
+      ${p.fotos && p.fotos[0] ? `<img src="${esc(p.fotos[0])}" alt="" loading="lazy">` : `<span class="noimg"></span>`}
+      <span class="mid"><b>${esc(p.nombre)}</b><span class="sub">${CALIDADES[p.calidad]||""} · Talla ${esc(p.talla)||"—"} · ${DEPTOS[p.departamento]||""}</span></span>
+      <span class="r"><span class="price">${money(p.precio)}</span><span class="st ${p.estado}">${ESTADOS[p.estado]}</span></span>
+    </button>`).join("")
+    : `<div class="empty">${products.length ? "No hay prendas en este estado." : "Aún no has subido prendas. Toca <b>+ Subir prenda</b> para empezar."}</div>`;
+}
+function showList(){
+  editing = null;
+  $("#vEdit").hidden = true; $("#vAp").hidden = true; $("#vList").hidden = false;
+  $("#newBtn").hidden = false; $("#saveBtn").hidden = true;
+  window.scrollTo(0,0);
+}
+
+/* ===== Editor ===== */
+function fillSelect(sel, obj, value){ sel.innerHTML = Object.entries(obj).map(([k,l])=>`<option value="${k}" ${k===value?"selected":""}>${l}</option>`).join(""); }
+function fillTipos(){ const d = $("#fDepto").value; const opts = d==="accesorios" ? TIPOS_ACC : TIPOS_ROPA; const cur = editing.tipo; fillSelect($("#fTipo"), opts, opts[cur] ? cur : Object.keys(opts)[0]); }
+function openEditor(p){
+  editing = p ? {id:p.id, tipo:p.tipo, estado:p.estado, real:p.foto_real, fotos:(p.fotos||[]).map(u=>({url:u}))}
+              : {id:null, tipo:"vestido", estado:"disponible", real:null, fotos:[]};
+  $("#edTitle").textContent = p ? "Editar prenda" : "Subir prenda";
+  $("#fNombre").value = p ? p.nombre : "";
+  $("#fPrecio").value = p ? p.precio : "";
+  $("#fTalla").value = p ? p.talla : "";
+  $("#fMarca").value = p && p.marca !== "Sin marca" ? p.marca : "";
+  $("#fDesc").value = p ? p.descripcion : "";
+  fillSelect($("#fDepto"), DEPTOS, p ? p.departamento : "mujer");
+  fillTipos();
+  fillSelect($("#fCalidad"), CALIDADES, p ? p.calidad : "primera");
+  $("#fCond").innerHTML = CONDICIONES.map(c=>`<option ${c===(p?p.condicion:"Muy bueno")?"selected":""}>${c}</option>`).join("");
+  renderEstado(); renderPhotos();
+  $("#edErr").hidden = true;
+  const del = $("#delBtn"); del.hidden = !p; del.classList.remove("armed"); del.textContent = "Eliminar prenda";
+  $("#vList").hidden = true; $("#vAp").hidden = true; $("#vEdit").hidden = false;
+  $("#newBtn").hidden = true; const sb = $("#saveBtn"); sb.hidden = false; sb.disabled = false; sb.textContent = p ? "Guardar cambios" : "Guardar prenda";
+  window.scrollTo(0,0);
+}
+function renderEstado(){
+  $("#fEstado").innerHTML = Object.entries(ESTADOS).map(([k,l])=>`<button type="button" data-estado="${k}" aria-pressed="${editing.estado===k}">${l}</button>`).join("");
+  $("#estadoHint").textContent = ESTADO_HINT[editing.estado];
+}
+function renderPhotos(){
+  const f = editing.fotos;
+  $("#photos").innerHTML = f.map((ph,i)=>`
+    <div class="ph"><img src="${esc(ph.preview || ph.url)}" alt="Foto ${i+1}">
+      ${i===0?'<span class="tag">Principal</span>':""}${editing.real===i?'<span class="tag real">Foto real</span>':""}
+      <div class="tools">
+        <button type="button" data-left="${i}" aria-label="Mover a la izquierda" ${i===0?"disabled style='opacity:.35'":""}>←</button>
+        <button type="button" data-real="${i}" aria-label="Marcar como foto real" aria-pressed="${editing.real===i}">★</button>
+        <button type="button" data-rmph="${i}" aria-label="Quitar foto">✕</button>
+      </div>
+    </div>`).join("") + (f.length < 6 ? `<label class="add" for="fileIn"><b>+</b>Agregar fotos</label>` : "");
+}
+function movePhoto(i, j){
+  const f = editing.fotos; [f[i], f[j]] = [f[j], f[i]];
+  if (editing.real===i) editing.real=j; else if (editing.real===j) editing.real=i;
+}
+
+/* Recorta a 3:4 y comprime (máx. 900×1200, JPG) */
+function loadImg(file){ return new Promise((ok,ko)=>{ const u=URL.createObjectURL(file), im=new Image(); im.onload=()=>ok(im); im.onerror=()=>ko(new Error("No se pudo leer la foto")); im.src=u; }); }
+async function prepPhoto(file){
+  const im = await loadImg(file), r = 3/4;
+  let sw = im.naturalWidth, sh = im.naturalHeight, sx = 0, sy = 0;
+  if (sw/sh > r){ const nw = sh*r; sx = (sw-nw)/2; sw = nw; } else { const nh = sw/r; sy = (sh-nh)/2; sh = nh; }
+  const sc = Math.min(1, 900/sw), cw = Math.round(sw*sc), ch = Math.round(sh*sc);
+  const c = document.createElement("canvas"); c.width = cw; c.height = ch;
+  c.getContext("2d").drawImage(im, sx, sy, sw, sh, 0, 0, cw, ch);
+  URL.revokeObjectURL(im.src);
+  const blob = await new Promise(ok => c.toBlob(ok, "image/jpeg", 0.8));
+  return {blob, preview: URL.createObjectURL(blob)};
+}
+$("#fileIn").addEventListener("change", async e => {
+  const files = [...e.target.files].slice(0, 6 - editing.fotos.length); e.target.value = "";
+  for (const f of files){
+    try { editing.fotos.push(await prepPhoto(f)); } catch(ex){ toast("Una foto no se pudo leer"); }
+  }
+  $("#edErr").hidden = true; renderPhotos();
+});
+
+const pathOf = url => url.split(`/object/public/${BUCKET}/`)[1];
+async function uploadBlob(blob){
+  const name = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+  await api(`/storage/v1/object/${BUCKET}/${name}`, {method:"POST", raw:true, body:blob, headers:{"Content-Type":"image/jpeg","x-upsert":"false"}});
+  return `${DB.url}/storage/v1/object/public/${BUCKET}/${name}`;
+}
+async function removeFiles(urls){
+  const prefixes = urls.map(pathOf).filter(Boolean);
+  if (prefixes.length) try { await api(`/storage/v1/object/${BUCKET}`, {method:"DELETE", body:{prefixes}}); } catch(e){}
+}
+
+async function save(){
+  const err = $("#edErr"), btn = $("#saveBtn");
+  const nombre = $("#fNombre").value.trim(), precio = parseInt($("#fPrecio").value, 10);
+  let msg = "";
+  if (!editing.fotos.length) msg = "Agrega al menos una foto.";
+  else if (!nombre) msg = "Escribe el nombre de la prenda.";
+  else if (!(precio >= 0)) msg = "Escribe el precio en pesos, solo números.";
+  err.textContent = msg; err.hidden = !msg;
+  if (msg){ err.scrollIntoView({block:"center", behavior:"smooth"}); return; }
+
+  btn.disabled = true;
+  try {
+    const fotos = [], nuevas = editing.fotos.filter(f=>f.blob).length; let n = 0;
+    for (const f of editing.fotos){
+      if (f.blob){ n++; btn.textContent = `Subiendo foto ${n} de ${nuevas}…`; fotos.push(await uploadBlob(f.blob)); }
+      else fotos.push(f.url);
+    }
+    btn.textContent = "Guardando…";
+    const row = {
+      nombre, precio, talla: $("#fTalla").value.trim(), marca: $("#fMarca").value.trim() || "Sin marca",
+      departamento: $("#fDepto").value, tipo: $("#fTipo").value, calidad: $("#fCalidad").value, condicion: $("#fCond").value,
+      descripcion: $("#fDesc").value.trim(), estado: editing.estado, fotos,
+      foto_real: editing.real!=null && editing.real < fotos.length ? editing.real : null
+    };
+    if (editing.id){
+      const before = products.find(p=>p.id===editing.id);
+      await api(`/rest/v1/productos?id=eq.${editing.id}`, {method:"PATCH", body:row, headers:{Prefer:"return=minimal"}});
+      const quitadas = (before && before.fotos || []).filter(u=>!fotos.includes(u));
+      await removeFiles(quitadas);
+      toast("Cambios guardados");
+    } else {
+      await api("/rest/v1/productos", {method:"POST", body:row, headers:{Prefer:"return=minimal"}});
+      toast("Prenda publicada");
+    }
+    filter = row.estado; showList(); await loadProducts();
+  } catch(ex){
+    if (ex.message !== "Sesión terminada"){ err.textContent = "No se pudo guardar: " + ex.message + ". Revisa tu internet e inténtalo de nuevo."; err.hidden = false; }
+    btn.disabled = false; btn.textContent = editing && editing.id ? "Guardar cambios" : "Guardar prenda";
+  }
+}
+async function del(){
+  const b = $("#delBtn");
+  if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "Toca otra vez para eliminarla para siempre"; return; }
+  b.disabled = true; b.textContent = "Eliminando…";
+  try {
+    const p = products.find(x=>x.id===editing.id);
+    await api(`/rest/v1/productos?id=eq.${editing.id}`, {method:"DELETE", headers:{Prefer:"return=minimal"}});
+    await removeFiles(p && p.fotos || []);
+    toast("Prenda eliminada"); showList(); await loadProducts();
+  } catch(ex){ b.disabled = false; b.classList.remove("armed"); b.textContent = "Eliminar prenda"; $("#edErr").textContent = "No se pudo eliminar: " + ex.message; $("#edErr").hidden = false; }
+}
+
+/* ===== Eventos ===== */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.f){ filter = t.dataset.f; renderList(); }
+  else if (t.classList.contains("row")) openEditor(products.find(p=>p.id===+t.dataset.id));
+  else if (t.id==="newBtn") openEditor(null);
+  else if (t.id==="back") showList();
+  else if (t.id==="saveBtn") save();
+  else if (t.id==="delBtn") del();
+  else if (t.id==="reload") loadProducts();
+  else if (t.dataset.estado){ editing.estado = t.dataset.estado; renderEstado(); }
+  else if (t.dataset.left){ const i=+t.dataset.left; if (i>0){ movePhoto(i,i-1); renderPhotos(); } }
+  else if (t.dataset.real){ const i=+t.dataset.real; editing.real = editing.real===i ? null : i; renderPhotos(); }
+  else if (t.dataset.rmph){ const i=+t.dataset.rmph; editing.fotos.splice(i,1);
+    if (editing.real===i) editing.real=null; else if (editing.real>i) editing.real--; renderPhotos(); }
+  else if (t.id==="tabProd" || t.id==="tabAp"){
+    const ap = t.id==="tabAp"; $("#tabProd").setAttribute("aria-selected", String(!ap)); $("#tabAp").setAttribute("aria-selected", String(ap));
+    if (ap){ $("#vList").hidden = true; $("#vEdit").hidden = true; $("#vAp").hidden = false; $("#newBtn").hidden = true; $("#saveBtn").hidden = true; }
+    else showList();
+  }
+});
+$("#fDepto").addEventListener("change", () => { editing.tipo = $("#fTipo").value; fillTipos(); });
+$("#fTipo").addEventListener("change", () => { editing.tipo = $("#fTipo").value; });
+
+/* ===== Inicio ===== */
+if (session) enter().catch(() => showLogin(session ? "No pudimos conectar. Revisa tu internet." : undefined));
+else showLogin();
+</script>
+</body>
+</html>
