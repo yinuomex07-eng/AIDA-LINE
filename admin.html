@@ -398,7 +398,7 @@ async function prepPhoto(file){
   const c = document.createElement("canvas"); c.width = cw; c.height = ch;
   c.getContext("2d").drawImage(im, sx, sy, sw, sh, 0, 0, cw, ch);
   URL.revokeObjectURL(im.src);
-  const blob = await new Promise(ok => c.toBlob(ok, "image/jpeg", 0.8));
+  const blob = await new Promise(ok => c.toBlob(ok, "image/jpeg", 0.72));
   return {blob, preview: URL.createObjectURL(blob)};
 }
 $("#fileIn").addEventListener("change", async e => {
