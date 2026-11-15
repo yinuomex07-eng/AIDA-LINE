@@ -86,6 +86,11 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .hero-card{position:relative;overflow:hidden;border-radius:20px;background:var(--accent);color:var(--accent-ink);padding:26px 22px 22px;display:grid;gap:14px}
 .hero-card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;
   background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(255,255,255,.35) 6px 9px);opacity:.9}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.hero-card.has-img{color:#fff;background:#2a2430;min-height:min(125vw,520px);align-content:end}
+.hero-card.has-img::before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(to top,rgba(15,10,18,.85) 0%,rgba(15,10,18,.5) 45%,rgba(15,10,18,.05) 78%)}
+.hero-card>*:not(.hero-img),.hero-card::after{position:relative;z-index:1}
+.hero-card::after{position:absolute}
 .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
 .hero h1{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:clamp(28px,7.4vw,46px);line-height:1.02;letter-spacing:-.01em;max-width:16ch}
 .hero p{margin:0;max-width:44ch;font-size:15.5px;opacity:.92}
@@ -292,7 +297,8 @@ label.field input,label.field textarea{border:1px solid var(--line);background:v
 
 <main id="inicio">
   <section class="hero wrap">
-    <div class="hero-card">
+    <div class="hero-card" id="heroCard">
+      <img class="hero-img" id="heroImg" alt="" hidden>
       <span class="eyebrow">Ropa de paca · San Cristóbal de las Casas</span>
       <h1>Ropa de paca, escogida prenda por prenda.</h1>
       <p>Cada pieza se revisa, se lava, se desinfecta y se plancha antes de llegar a ti. Aparta lo que te guste y te lo entregamos en la ciudad.</p>
@@ -494,6 +500,18 @@ function fromDb(r){
     size:esc(r.talla || "—"), price:r.precio, cond:esc(r.condicion), desc:esc(r.descripcion),
     fotos: r.fotos && r.fotos.length ? r.fotos : null, real:r.foto_real, estado:r.estado, creado:r.creado, color:"#d9d4dc",
     nuevo: Date.now() - new Date(r.creado).getTime() < NEW_DAYS*864e5 };
+}
+/* Foto de portada: se cambia desde el panel */
+async function loadAjustes(){
+  try {
+    const res = await fetch(`${DB.url}/rest/v1/ajustes?select=portada_foto&id=eq.1`, {headers:{apikey:DB.key}});
+    if (!res.ok) return;
+    const row = (await res.json())[0];
+    if (!row || !row.portada_foto) return;
+    const img = $("#heroImg");
+    img.onload = () => { img.hidden = false; $("#heroCard").classList.add("has-img"); };
+    img.src = row.portada_foto;
+  } catch(e){}
 }
 async function loadProducts(){
   loadState = "loading"; renderGrid();
@@ -839,7 +857,7 @@ function toShop(){ if ($("#inicio").hidden) location.hash = "#catalogo"; }
 
 $("#phoneTxt").textContent = STORE.whatsappLabel;
 $("#fab").href = waLink(`Hola ${STORE.name}, tengo una pregunta.`);
-renderRails(); renderGrid(); renderCount(); route(); loadProducts();
+renderRails(); renderGrid(); renderCount(); route(); loadProducts(); loadAjustes();
 </script>
 </body>
 </html>

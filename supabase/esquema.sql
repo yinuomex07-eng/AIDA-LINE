@@ -69,3 +69,18 @@ create policy "Admin cambia fotos" on storage.objects
 drop policy if exists "Admin borra fotos" on storage.objects;
 create policy "Admin borra fotos" on storage.objects
   for delete to authenticated using (bucket_id = 'fotos' and public.es_admin());
+
+-- 5) Ajustes de la tienda (foto de portada)
+create table if not exists public.ajustes (
+  id smallint primary key default 1 check (id = 1),
+  portada_foto text
+);
+insert into public.ajustes (id) values (1) on conflict do nothing;
+alter table public.ajustes enable row level security;
+drop policy if exists "Todos leen ajustes" on public.ajustes;
+create policy "Todos leen ajustes" on public.ajustes for select using (true);
+drop policy if exists "Admin edita ajustes" on public.ajustes;
+create policy "Admin edita ajustes" on public.ajustes
+  for update to authenticated using (public.es_admin()) with check (public.es_admin());
+grant select on public.ajustes to anon, authenticated;
+grant update on public.ajustes to authenticated;

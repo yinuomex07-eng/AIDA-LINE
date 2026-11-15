@@ -105,6 +105,13 @@ main{padding-block:16px 110px}
 .seg button{border:0;background:transparent;border-radius:9px;padding:9px 2px;font-weight:700;font-size:12.5px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
 .progress{font-size:13.5px;color:var(--muted);text-align:center}
+.hero-prev{position:relative;border-radius:16px;overflow:hidden;background:var(--accent);color:#fff;min-height:300px;display:grid;align-content:end}
+.hero-prev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-prev.has-img::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(15,10,18,.85),rgba(15,10,18,.05) 75%)}
+.hp-txt{position:relative;z-index:2;padding:18px;display:grid;gap:6px}
+.hp-txt span{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.hp-txt b{font-family:var(--display);font-stretch:112%;font-size:22px;line-height:1.05}
+label.btn{cursor:pointer}
 .toast{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translate(-50%,-10px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:40;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .soon{display:grid;gap:8px;justify-items:center;text-align:center;color:var(--muted);padding:40px 12px}
@@ -136,6 +143,7 @@ main{padding-block:16px 110px}
       </div>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" id="tabProd" aria-selected="true">Prendas</button>
+        <button class="tab" role="tab" id="tabPort" aria-selected="false">Portada</button>
         <button class="tab" role="tab" id="tabAp" aria-selected="false">Apartados <span class="pill">Pronto</span></button>
       </div>
     </div>
@@ -186,6 +194,25 @@ main{padding-block:16px 110px}
 
       <span class="err" id="edErr" hidden></span>
       <button class="btn btn-danger full" id="delBtn" hidden>Eliminar prenda</button>
+    </section>
+
+    <!-- Portada -->
+    <section id="vPort" class="ed" hidden>
+      <div class="sec">
+        <h2>Imagen de portada</h2>
+        <p class="hint">Es la imagen grande del inicio de la tienda. El texto va encima, abajo, con una sombra para que se lea. Usa una foto vertical con lo importante en la parte de arriba o al centro.</p>
+        <div class="hero-prev" id="heroPrev">
+          <img id="heroPrevImg" alt="" hidden>
+          <div class="hp-txt"><span>Ropa de paca · San Cristóbal de las Casas</span><b>Ropa de paca, escogida prenda por prenda.</b></div>
+        </div>
+        <input type="file" id="heroIn" accept="image/*" hidden>
+        <div class="grid2">
+          <label class="btn btn-ghost" for="heroIn">Elegir imagen</label>
+          <button class="btn btn-danger" id="heroDel" hidden>Quitar imagen</button>
+        </div>
+        <span class="err" id="heroErr" hidden></span>
+        <button class="btn btn-dark full" id="heroSave" hidden>Guardar portada</button>
+      </div>
     </section>
 
     <!-- Apartados -->
@@ -300,9 +327,19 @@ function renderList(){
     </button>`).join("")
     : `<div class="empty">${products.length ? "No hay prendas en este estado." : "Aún no has subido prendas. Toca <b>+ Subir prenda</b> para empezar."}</div>`;
 }
+function showTab(id){
+  ["tabProd","tabPort","tabAp"].forEach(k => $("#"+k).setAttribute("aria-selected", String(k===id)));
+  if (id==="tabProd") return showList();
+  editing = null;
+  $("#vList").hidden = true; $("#vEdit").hidden = true;
+  $("#vAp").hidden = id!=="tabAp"; $("#vPort").hidden = id!=="tabPort";
+  $("#newBtn").hidden = true; $("#saveBtn").hidden = true;
+  if (id==="tabPort") loadHero();
+}
 function showList(){
   editing = null;
-  $("#vEdit").hidden = true; $("#vAp").hidden = true; $("#vList").hidden = false;
+  ["tabProd","tabPort","tabAp"].forEach(k => $("#"+k).setAttribute("aria-selected", String(k==="tabProd")));
+  $("#vEdit").hidden = true; $("#vAp").hidden = true; $("#vPort").hidden = true; $("#vList").hidden = false;
   $("#newBtn").hidden = false; $("#saveBtn").hidden = true;
   window.scrollTo(0,0);
 }
@@ -435,6 +472,54 @@ async function del(){
   } catch(ex){ b.disabled = false; b.classList.remove("armed"); b.textContent = "Eliminar prenda"; $("#edErr").textContent = "No se pudo eliminar: " + ex.message; $("#edErr").hidden = false; }
 }
 
+/* ===== Portada ===== */
+let hero = {url:null, nuevo:null};
+function renderHero(){
+  const src = hero.nuevo ? hero.nuevo.preview : hero.url, img = $("#heroPrevImg");
+  img.hidden = !src; if (src) img.src = src;
+  $("#heroPrev").classList.toggle("has-img", !!src);
+  const d = $("#heroDel"); d.hidden = !src; d.classList.remove("armed"); d.textContent = hero.nuevo ? "Cancelar" : "Quitar imagen";
+  $("#heroSave").hidden = !hero.nuevo;
+}
+function heroError(msg){ const e=$("#heroErr"); e.textContent = msg || ""; e.hidden = !msg; }
+async function loadHero(){
+  heroError(); hero.nuevo = null;
+  try { const r = await api("/rest/v1/ajustes?select=portada_foto&id=eq.1"); hero.url = r && r[0] ? r[0].portada_foto : null; renderHero(); }
+  catch(e){ heroError("Falta activar la portada en la base de datos. Pídele a Claude el texto para Supabase."); }
+}
+async function prepHero(file){
+  const im = await loadImg(file), max = 1600, sc = Math.min(1, max/Math.max(im.naturalWidth, im.naturalHeight));
+  const c = document.createElement("canvas"); c.width = Math.round(im.naturalWidth*sc); c.height = Math.round(im.naturalHeight*sc);
+  c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(im.src);
+  const blob = await new Promise(ok => c.toBlob(ok, "image/jpeg", 0.82));
+  return {blob, preview: URL.createObjectURL(blob)};
+}
+$("#heroIn").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try { hero.nuevo = await prepHero(f); heroError(); renderHero(); } catch(ex){ heroError("No se pudo leer la imagen. Prueba con otra."); }
+});
+async function saveHero(){
+  const b = $("#heroSave"); b.disabled = true; b.textContent = "Subiendo…";
+  try {
+    const url = await uploadBlob(hero.nuevo.blob);
+    await api("/rest/v1/ajustes?id=eq.1", {method:"PATCH", body:{portada_foto:url}, headers:{Prefer:"return=minimal"}});
+    if (hero.url) await removeFiles([hero.url]);
+    hero = {url, nuevo:null}; renderHero(); toast("Portada actualizada");
+  } catch(ex){ if (ex.message !== "Sesión terminada") heroError("No se pudo guardar: " + ex.message); }
+  b.disabled = false; b.textContent = "Guardar portada";
+}
+async function delHero(){
+  if (hero.nuevo){ hero.nuevo = null; renderHero(); return; }
+  const b = $("#heroDel");
+  if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "Toca otra vez para quitarla"; return; }
+  b.disabled = true;
+  try {
+    await api("/rest/v1/ajustes?id=eq.1", {method:"PATCH", body:{portada_foto:null}, headers:{Prefer:"return=minimal"}});
+    await removeFiles([hero.url]); hero.url = null; renderHero(); toast("Portada quitada: se ve el recuadro de color");
+  } catch(ex){ if (ex.message !== "Sesión terminada") heroError("No se pudo quitar: " + ex.message); }
+  b.disabled = false; b.classList.remove("armed"); b.textContent = "Quitar imagen";
+}
+
 /* ===== Eventos ===== */
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
@@ -450,11 +535,9 @@ document.addEventListener("click", e => {
   else if (t.dataset.real){ const i=+t.dataset.real; editing.real = editing.real===i ? null : i; renderPhotos(); }
   else if (t.dataset.rmph){ const i=+t.dataset.rmph; editing.fotos.splice(i,1);
     if (editing.real===i) editing.real=null; else if (editing.real>i) editing.real--; renderPhotos(); }
-  else if (t.id==="tabProd" || t.id==="tabAp"){
-    const ap = t.id==="tabAp"; $("#tabProd").setAttribute("aria-selected", String(!ap)); $("#tabAp").setAttribute("aria-selected", String(ap));
-    if (ap){ $("#vList").hidden = true; $("#vEdit").hidden = true; $("#vAp").hidden = false; $("#newBtn").hidden = true; $("#saveBtn").hidden = true; }
-    else showList();
-  }
+  else if (t.id==="tabProd" || t.id==="tabAp" || t.id==="tabPort") showTab(t.id);
+  else if (t.id==="heroSave") saveHero();
+  else if (t.id==="heroDel") delHero();
 });
 $("#fDepto").addEventListener("change", () => { editing.tipo = $("#fTipo").value; fillTipos(); });
 $("#fTipo").addEventListener("change", () => { editing.tipo = $("#fTipo").value; });
